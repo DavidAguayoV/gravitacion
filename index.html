@@ -69,10 +69,37 @@
           <input type="range" id="rangoA" min="-90" max="180" step="1">
           <span class="campo"><input id="campoA" inputmode="decimal" aria-label="Ángulo sobre la horizontal en grados"><span class="u">°</span></span>
         </div>
+        <div class="control">
+          <label for="campoMs">Sonda <i>m</i></label>
+          <span></span>
+          <span class="campo"><input id="campoMs" inputmode="decimal" aria-label="Masa de la sonda en kg"><span class="u">kg</span></span>
+        </div>
         <div class="fila">
           <button class="principal" id="lanzar">Lanzar</button>
         </div>
         <p class="nota">O arrastra la flecha cian. <i class="serif">θ</i> = 0° es horizontal; 90°, hacia arriba.</p>
+      </section>
+
+      <section class="grupo">
+        <h2 id="tituloDatos">Sonda</h2>
+        <dl class="datos">
+          <div class="dato"><dt>distancia al centro <i>r</i></dt><dd id="dR">—</dd></div>
+          <div class="dato"><dt>altura <i>h</i></dt><dd id="dH">—</dd></div>
+          <div class="dato"><dt>rapidez <i>v</i></dt><dd id="dV" class="c-vel">—</dd></div>
+          <div class="dato"><dt>fuerza <i>F</i> = <i>GMm</i>/<i>r</i>²</dt><dd id="dF" class="c-fuerza">—</dd></div>
+          <div class="dato pista"><dt>órbita circular √(<i>GM</i>/<i>r</i>)</dt><dd id="dVc">—</dd></div>
+          <div class="dato pista"><dt>escape √(2<i>GM</i>/<i>r</i>)</dt><dd id="dVe">—</dd></div>
+        </dl>
+      </section>
+
+      <section class="grupo">
+        <h2>Ver</h2>
+        <div class="marcas">
+          <label><input type="checkbox" id="verFuerza" checked> <span class="c-fuerza">Fuerza</span></label>
+          <label><input type="checkbox" id="verVel" checked> <span class="c-vel">Velocidad</span></label>
+          <label><input type="checkbox" id="verCirculo"> Círculo a la altura actual</label>
+          <label><input type="checkbox" id="verRegla" checked> Regla</label>
+        </div>
       </section>
     </aside>
   </main>

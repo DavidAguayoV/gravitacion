@@ -22,6 +22,7 @@
     autoVista: true,     // la vista se aleja sola si la sonda sale del cuadro
     varias: false,       // true = cada lanzamiento agrega una sonda
     creadas: 0,
+    ver: { fuerza: true, velocidad: true, circulo: false, regla: true },
   };
 
   const dibujo = new Grav.Dibujo($('lienzo'));
@@ -60,6 +61,7 @@
     $('campoH').value = fmt.numero(lanz.h / uL, 3);
     $('campoV').value = fmt.numero(lanz.v / uV, 3);
     $('campoA').value = fmt.decimal(lanz.angulo, 3);
+    $('campoMs').value = fmt.numero(lanz.m, 3);
     $('nombreMundo').textContent = mundo.nombre;
     document.querySelectorAll('.campo.malo').forEach((c) => c.classList.remove('malo'));
   }
@@ -105,6 +107,11 @@
   enlazar('rangoA', 'campoA',
     (u) => (estado.lanz.angulo = u),
     (x) => x >= -180 && x <= 180 && ((estado.lanz.angulo = x), true));
+  $('campoMs').addEventListener('change', (e) => {
+    const x = fmt.leer(e.target.value);
+    if (x > 0) { estado.lanz.m = x; mostrarControles(); }
+    else e.target.parentElement.classList.add('malo');
+  });
 
   // ---------- Sondas ----------
 
@@ -164,9 +171,12 @@
   }
 
   function escalas() {
+    const { M, R } = estado.mundo;
     const Lref = 0.3 * Math.min(dibujo.w, dibujo.h);
-    const vRef = redondo(1.3 * vEscape(estado.mundo.M, estado.mundo.R));
-    return { Lref, vRef, vPx: Lref / vRef };
+    const vRef = redondo(1.3 * vEscape(M, R));
+    // La fuerza en la superficie, GMm/R², mide 0,45 Lref.
+    const fRef = (Grav.G * M * estado.lanz.m) / (R * R);
+    return { Lref, vRef, vPx: Lref / vRef, fPx: (0.45 * Lref) / fRef };
   }
 
   // ---------- Arrastre de la flecha y gestos ----------
@@ -283,6 +293,36 @@
     else if (e.key === 'r' || e.key === 'R') reiniciar();
   });
 
+  // ---------- Casillas de «Ver» ----------
+
+  const CASILLAS = { verFuerza: 'fuerza', verVel: 'velocidad', verCirculo: 'circulo', verRegla: 'regla' };
+  for (const [id, clave] of Object.entries(CASILLAS)) {
+    $(id).checked = estado.ver[clave];
+    $(id).addEventListener('change', (e) => (estado.ver[clave] = e.target.checked));
+  }
+
+  // ---------- Panel de datos ----------
+
+  /**
+   * Muestra r, h, v, F, v_circular y v_escape de la sonda elegida. Si no hay ninguna,
+   * los del punto de partida con la rapidez de los controles.
+   */
+  function mostrarDatos() {
+    const { mundo, lanz } = estado;
+    let s = estado.sondas[estado.elegida];
+    $('tituloDatos').textContent = s ? 'Sonda' : 'En el punto de partida';
+    if (!s) s = crearSonda(mundo, lanz.h, lanz.v, lanz.angulo, lanz.m);
+    const r = Math.hypot(s.x, s.y);
+    const v = Math.hypot(s.vx, s.vy);
+    const F = (Grav.G * mundo.M * s.m) / (r * r);
+    $('dR').innerHTML = fmt.distancia(r, true);
+    $('dH').innerHTML = fmt.distancia(Math.max(0, r - mundo.R), true);
+    $('dV').innerHTML = fmt.rapidez(v, true);
+    $('dF').innerHTML = fmt.numero(F, 3, true) + ' N';
+    $('dVc').innerHTML = fmt.rapidez(Grav.vCircular(mundo.M, r), true);
+    $('dVe').innerHTML = fmt.rapidez(vEscape(mundo.M, r), true);
+  }
+
   // ---------- Bucle de animación ----------
 
   const TEXTO_ESTADO = { vuelo: '', impacto: 'Impacto', escapo: 'Escapó', lejos: 'Escapó' };
@@ -316,13 +356,20 @@
   function dibujar() {
     const { ctx } = dibujo;
     ctx.clearRect(0, 0, dibujo.w, dibujo.h);
-    dibujo.mundo(estado.mundo, estado.lanz.h);
+    const { mundo, ver } = estado;
+    const esc = escalas();
+    const elegida = estado.sondas[estado.elegida];
+    dibujo.mundo(mundo, estado.lanz.h);
+    if (ver.circulo && elegida) dibujo.circulo(Math.hypot(elegida.x, elegida.y));
     for (const s of estado.sondas) dibujo.estela(s, s.color, s.guiones);
     estado.sondas.forEach((s, i) => dibujo.sonda(s, s.color, i === estado.elegida && estado.sondas.length > 1));
-    dibujo.lanzador(estado.mundo, estado.lanz, escalas().vPx);
+    for (const s of estado.sondas) dibujo.vectores(s, mundo.M, ver, esc.vPx, esc.fPx);
+    dibujo.lanzador(mundo, estado.lanz, esc.vPx);
+    if (ver.regla) dibujo.regla(mundo, elegida, dibujo.w < 560 ? 70 : 24);
   }
 
   let antes = performance.now();
+  let ultimoPanel = 0;
   function cuadro(ahora) {
     const dtReal = Math.min(0.05, (ahora - antes) / 1000); // si la pestaña se durmió, no salta
     antes = ahora;
@@ -332,6 +379,8 @@
     seguirSonda();
     dibujar();
     mostrarEstado();
+    // El panel se actualiza unas 10 veces por segundo: los números no alcanzan a leerse más rápido.
+    if (ahora - ultimoPanel > 100) { mostrarDatos(); ultimoPanel = ahora; }
     requestAnimationFrame(cuadro);
   }
 
