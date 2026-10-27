@@ -361,6 +361,7 @@ input[type='range'] {
 .logros { margin: 8px 0 0; padding-left: 1.3em; color: var(--ok); }
 .logros li { margin: 3px 0; }
 .logros:empty { display: none; }
+.logros li.volvio { color: var(--muted); }
 code { font-family: var(--mono); font-size: 0.95em; color: var(--ink); }
 
 /* Lista de sondas (con varias a la vez) */
@@ -399,6 +400,11 @@ code { font-family: var(--mono); font-size: 0.95em; color: var(--ink); }
   .barras { gap: 8px; padding-bottom: 18px; }
   .barra { width: 14px; }
   .barra::after { bottom: -19px; font-size: var(--t-sm); }
+  /* Modo reto en el celular: primero lanzar y ver los datos, después el registro y el mundo */
+  .reto .panel { display: flex; flex-direction: column; }
+  .reto #grupoLanz { order: -3; }
+  .reto #grupoDatos { order: -2; }
+  .reto #grupoReto { order: -1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

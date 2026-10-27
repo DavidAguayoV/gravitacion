@@ -314,7 +314,12 @@
     $('play').setAttribute('aria-label', corre ? 'Pausa' : 'Seguir');
   }
 
-  $('lanzar').addEventListener('click', lanzar);
+  $('lanzar').addEventListener('click', () => {
+    lanzar();
+    // En el celular el botón queda bajo el lienzo: se sube para ver el vuelo
+    const escena = $('lienzo').getBoundingClientRect();
+    if (escena.top < -0.25 * escena.height) window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
   $('play').addEventListener('click', () => ponerPlay(!estado.corriendo));
   $('reiniciar').addEventListener('click', reiniciar);
   $('borrar').addEventListener('click', borrarEstelas);
@@ -439,8 +444,9 @@
   $('optProyector').addEventListener('change', (e) => ponerProyector(e.target.checked));
 
   /**
-   * Logros del reto: la primera vez que una sonda completa una vuelta casi circular o escapa,
-   * se anota con qué rapidez se lanzó. Así cada grupo puede informar lo que encontró.
+   * Registro del reto: cuando una sonda completa una vuelta casi circular, escapa o choca,
+   * se anota con qué rapidez se lanzó (y, si chocó, cuánto subió). Así cada grupo puede
+   * informar lo que encontró sin tener que mirar la pantalla en el momento justo.
    */
   function anotarLogros() {
     for (const s of estado.sondas) {
@@ -448,12 +454,15 @@
       let que = null;
       if (s.circular === true) que = 'Órbita circular';
       else if (s.estado === 'escapo' || s.estado === 'lejos') que = 'Escapó';
+      else if (s.estado === 'impacto') que = 'Volvió';
       if (!que) continue;
       s.anotada = true;
       const L = s.lanzamiento;
       const li = document.createElement('li');
+      if (que === 'Volvió') li.className = 'volvio';
       li.innerHTML = `${que}: ${estado.mundo.nombre}, <i class="serif">h</i> = ${fmt.distancia(L.h, true)}, ` +
-        `<i class="serif">v</i> = ${fmt.rapidez(L.v, true)}, ${fmt.decimal(L.angulo, 3)}°`;
+        `<i class="serif">v</i> = ${fmt.rapidez(L.v, true)}, ${fmt.decimal(L.angulo, 3)}°` +
+        (que === 'Volvió' ? `; subió ${fmt.distancia(s.rMax - estado.mundo.R, true)}` : '');
       $('logros').appendChild(li);
     }
   }
@@ -482,6 +491,8 @@
     const F = (Grav.G * mundo.M * s.m) / (r * r);
     $('dR').innerHTML = fmt.distancia(r, true);
     $('dH').innerHTML = fmt.distancia(Math.max(0, r - mundo.R), true);
+    // Solo una sonda lanzada tiene altura máxima; en el punto de partida no hay nada que medir
+    $('dHmax').innerHTML = estado.sondas[estado.elegida] ? fmt.distancia(s.rMax - mundo.R, true) : '—';
     $('dV').innerHTML = fmt.rapidez(v, true);
     $('dF').innerHTML = fmt.numero(F, 3, true) + ' N';
     $('dVc').innerHTML = fmt.rapidez(Grav.vCircular(mundo.M, r), true);
@@ -523,7 +534,7 @@
     caja.className = 'estado';
     if (!s) { caja.textContent = ''; return; }
     let t = TEXTO_ESTADO[s.estado];
-    if (s.estado === 'impacto') t += ' a ' + fmt.rapidez(s.vImpacto);
+    if (s.estado === 'impacto') t += ' a ' + fmt.rapidez(s.vImpacto) + ' · subió ' + fmt.distancia(s.rMax - estado.mundo.R);
     if (s.estado === 'vuelo' && s.vueltas > 0) {
       t = s.circular ? 'Órbita circular' : 'En órbita';
       caja.classList.add('orbita');

@@ -174,7 +174,32 @@ async function abrir(b, query, movil) {
     await p.close();
   }
 
-  // 7. Capturas de escritorio de las situaciones
+  // 7. La actividad «¿Escapa o vuelve?» en el celular, con los valores de la hoja (3 cifras)
+  for (const [mundo, ve] of [['luna', 2.37], ['marte', 5.03], ['mercurio', 4.25], ['titan', 2.64], ['ceres', 0.516]]) {
+    const p = await abrir(b, `?reto=1&mundo=${mundo}`, true);
+    const lanzarCon = async (v, angulo, h = 0) => {
+      await p.fill('#campoH', String(h)); await p.press('#campoH', 'Enter');
+      await p.fill('#campoA', String(angulo));
+      await p.fill('#campoV', String(Number(v.toPrecision(3))).replace('.', ',')); // sin Enter: el toque cierra el campo
+      await p.tap('#lanzar');
+      await p.evaluate(() => (window.gravitacion.estado.mult = 1e5));
+      await esperar(p, () => { const s = window.gravitacion.estado.sondas[0]; return s.estado !== 'vuelo' || s.vueltas >= 1; }, 60000);
+      return p.evaluate(() => { const g = window.gravitacion.estado, s = g.sondas[0]; return { estado: s.estado, circular: s.circular, h: (s.rMax - g.mundo.R) / g.mundo.R }; });
+    };
+    const kmS = mundo === 'ceres' ? 1000 : 1; // en Ceres el campo pide m/s
+    const a = await lanzarCon(0.9 * ve * kmS, 90);
+    const c = await lanzarCon(1.1 * ve * kmS, 0);
+    const d = await lanzarCon(ve / 2 * kmS, 90);
+    const R = await p.evaluate(() => window.gravitacion.estado.mundo.R / 1000);
+    const e = await lanzarCon(ve / 2 * kmS, 0, R);
+    const lista = await p.evaluate(() => document.querySelectorAll('#logros li').length);
+    revisar(`actividad ${mundo}: 0,9 v_e vuelve, 1,1 v_e horizontal escapa, v_e/2 sube R/3, órbita a h = R`,
+      a.estado === 'impacto' && c.estado !== 'impacto' && Math.abs(d.h - 1 / 3) < 0.01 && e.circular === true && lista === 4,
+      `h(0,9) = ${a.h.toFixed(2)} R, h(v_e/2) = ${d.h.toFixed(3)} R, circular: ${e.circular}, registro: ${lista}`);
+    await p.close();
+  }
+
+  // 8. Capturas de escritorio de las situaciones
   for (const [sit, extra, ms] of [
     ['canon', '', 6000], ['eliptica', '', 6000], ['escape', '', 3000], ['deimos', '', 2500], ['canon', '&proyector=1', 6000],
   ]) {

@@ -60,7 +60,7 @@
         <div class="botones" id="situaciones"></div>
       </section>
 
-      <section class="grupo">
+      <section class="grupo" id="grupoMundo">
         <h2>Mundo</h2>
         <div class="chips" id="mundos" role="group" aria-label="Mundos con datos reales"></div>
         <div class="control">
@@ -75,7 +75,7 @@
         </div>
       </section>
 
-      <section class="grupo">
+      <section class="grupo" id="grupoLanz">
         <h2>Lanzamiento</h2>
         <div class="control">
           <label for="rangoH">Altura <i>h</i></label>
@@ -103,12 +103,13 @@
         <p class="nota">O arrastra la flecha cian. <i class="serif">θ</i> = 0° es horizontal; 90°, hacia arriba.</p>
       </section>
 
-      <section class="grupo">
+      <section class="grupo" id="grupoDatos">
         <h2 id="tituloDatos">Sonda</h2>
         <div class="sondas" id="listaSondas" role="group" aria-label="Elegir sonda"></div>
         <dl class="datos">
           <div class="dato"><dt>distancia al centro <i>r</i></dt><dd id="dR">—</dd></div>
           <div class="dato"><dt>altura <i>h</i></dt><dd id="dH">—</dd></div>
+          <div class="dato"><dt>altura máxima</dt><dd id="dHmax">—</dd></div>
           <div class="dato"><dt>rapidez <i>v</i></dt><dd id="dV" class="c-vel">—</dd></div>
           <div class="dato"><dt>fuerza <i>F</i> = <i>GMm</i>/<i>r</i>²</dt><dd id="dF" class="c-fuerza">—</dd></div>
           <div class="dato pista"><dt>órbita circular √(<i>GM</i>/<i>r</i>)</dt><dd id="dVc">—</dd></div>

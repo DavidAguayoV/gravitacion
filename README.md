@@ -36,14 +36,16 @@ También funciona sin internet: basta abrir `index.html` (no necesita servidor n
 Salvo el cañón y los saltos, cada situación se arma **sobre el mundo elegido**: elegir la Luna
 y luego «Órbita circular» da la órbita circular de la Luna.
 
-Mundos con datos reales (NASA): Bennu, Deimos, Ceres, Luna, Europa, Marte, Tierra y Júpiter.
+Mundos con datos reales (NASA): Bennu, Deimos, Ceres, Luna, Europa, Titán, Mercurio, Marte, Tierra y Júpiter.
 
 ## Modo reto
 
 Oculta √(*GM*/*r*), √(2*GM*/*r*), las energías y las situaciones (que regalan la respuesta).
 Los grupos buscan, tanteando con el campo *v*, la rapidez de una órbita circular y la de escape.
 La página avisa «Órbita circular» si *r* varía menos de 1 % en la primera vuelta, y «Escapó»;
-cada hallazgo queda anotado en la lista del reto (mundo, *h*, *v*, ángulo) para informarlo.
+cada lanzamiento queda anotado en la lista del reto (mundo, *h*, *v*, ángulo y, si volvió, cuánto
+subió) para informarlo. En el celular, el modo reto pone primero los controles de lanzamiento
+y los datos, y al tocar **Lanzar** la página sube sola hasta el dibujo.
 
 Se activa con la casilla **Modo reto** o desde la dirección:
 
@@ -51,6 +53,14 @@ Se activa con la casilla **Modo reto** o desde la dirección:
 https://davidaguayov.github.io/gravitacion/?reto=1
 https://davidaguayov.github.io/gravitacion/?reto=1&mundo=luna
 ```
+
+### Actividad «¿Escapa o vuelve?»
+
+Hoja por grupo para usar solo con el celular o la tablet: `2026_2_FIS093/Clases/actividad_simulacion_hoja.tex`
+(cinco versiones: Luna, Marte, Mercurio, Titán y Ceres, cada una con su QR a `?reto=1&mundo=…`)
+y su pauta, `actividad_simulacion_pauta.tex`. Preguntas: hacia arriba con 0,9 y 1,1 *v*ₑ, 1,1 *v*ₑ en
+horizontal, *v*ₑ/2 hacia arriba (sube *R*/3, no *R*/4 como da *mgh*) y, si sobra tiempo, la órbita
+circular a *h* = *R*, que sale con *v*ₑ/2. `tests/navegador.js` hace la actividad completa en las cinco versiones.
 
 Otras opciones de la dirección: `?proyector=1` (letra y vectores grandes), `?tema=claro`
 (fondo claro, para salas con luz; la casilla **Tema claro** hace lo mismo y el navegador lo
