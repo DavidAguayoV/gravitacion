@@ -52,7 +52,9 @@ https://davidaguayov.github.io/gravitacion/?reto=1
 https://davidaguayov.github.io/gravitacion/?reto=1&mundo=luna
 ```
 
-Otras opciones de la dirección: `?proyector=1` (letra y vectores grandes), `?mundo=marte`,
+Otras opciones de la dirección: `?proyector=1` (letra y vectores grandes), `?tema=claro`
+(fondo claro, para salas con luz; la casilla **Tema claro** hace lo mismo y el navegador lo
+recuerda), `?mundo=marte`,
 `?situacion=canon` (claves: `canon`, `circular`, `escape`, `eliptica`, `cae`, `sobra`, `deimos`,
 `bennu`), `?varias=1`.
 

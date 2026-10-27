@@ -7,8 +7,8 @@
   const { MUNDOS, SITUACIONES, fmt, crearSonda, avanzar, vEscape, energias, escalaEnergia, tipoEnergia } = Grav;
   const $ = (id) => document.getElementById(id);
 
-  // Colores y patrones de línea de las sondas: se distinguen aunque no se vean los colores.
-  const COLORES = ['#ece8df', '#eb4789', '#7fd18b', '#b79cff', '#f2955a'];
+  // Patrones de línea de las sondas: se distinguen aunque no se vean los colores.
+  // El color de cada sonda sale de las variables CSS --s1…--s5 (cambia con el tema).
   const GUIONES = [[], [9, 5], [2, 4], [12, 4, 2, 4], [5, 3]];
 
   // ---------- Estado de la página ----------
@@ -124,10 +124,10 @@
     const { mundo, lanz } = estado;
     if (!estado.varias) estado.sondas = [];
     marcarSituacion(null);
-    if (estado.sondas.length >= COLORES.length) estado.sondas.shift(); // máximo 5 a la vez
+    if (estado.sondas.length >= GUIONES.length) estado.sondas.shift(); // máximo 5 a la vez
     const s = crearSonda(mundo, lanz.h, lanz.v, lanz.angulo, lanz.m);
-    const k = estado.creadas++ % COLORES.length;
-    s.color = COLORES[k];
+    const k = estado.creadas++ % GUIONES.length;
+    s.k = k; // índice de su color y su patrón
     s.guiones = GUIONES[k];
     s.escalaE = escalaEnergia(s, mundo);
     estado.sondas.push(s);
@@ -142,7 +142,7 @@
     estado.sondas = estado.sondas.map((s) => {
       const L = s.lanzamiento;
       const n = crearSonda(estado.mundo, L.h, L.v, L.angulo, L.m);
-      n.color = s.color;
+      n.k = s.k;
       n.guiones = s.guiones;
       n.escalaE = escalaEnergia(n, estado.mundo);
       return n;
@@ -160,7 +160,7 @@
     estado.sondas.forEach((s, i) => {
       const b = document.createElement('button');
       b.setAttribute('aria-pressed', String(i === estado.elegida));
-      b.innerHTML = `<svg viewBox="0 0 22 8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" stroke="${s.color}"
+      b.innerHTML = `<svg viewBox="0 0 22 8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" stroke="var(--s${s.k + 1})"
         stroke-width="2" stroke-dasharray="${s.guiones.join(' ')}"/></svg>${fmt.rapidez(s.lanzamiento.v)}`;
       b.addEventListener('click', () => elegirSonda(i));
       caja.appendChild(b);
@@ -424,7 +424,17 @@
     alCambiarTamano();
   }
 
+  /** Tema claro u oscuro. Se recuerda en este navegador (si el navegador lo permite). */
+  function ponerClaro(si) {
+    $('optClaro').checked = si;
+    document.documentElement.classList.toggle('claro', si);
+    document.querySelector('meta[name="theme-color"]').content = si ? '#eef1f6' : '#070a12';
+    dibujo.leerColores();
+    try { localStorage.setItem('gravitacion.tema', si ? 'claro' : 'oscuro'); } catch (e) { /* sin almacenamiento */ }
+  }
+
   $('optVarias').addEventListener('change', (e) => (estado.varias = e.target.checked));
+  $('optClaro').addEventListener('change', (e) => ponerClaro(e.target.checked));
   $('optReto').addEventListener('change', (e) => ponerReto(e.target.checked));
   $('optProyector').addEventListener('change', (e) => ponerProyector(e.target.checked));
 
@@ -541,8 +551,9 @@
     const elegida = estado.sondas[estado.elegida];
     dibujo.mundo(mundo, estado.lanz.h);
     if (ver.circulo && elegida) dibujo.circulo(Math.hypot(elegida.x, elegida.y));
-    for (const s of estado.sondas) dibujo.estela(s, s.color, s.guiones);
-    estado.sondas.forEach((s, i) => dibujo.sonda(s, s.color, i === estado.elegida && estado.sondas.length > 1));
+    const color = (s) => dibujo.c.sondas[s.k];
+    for (const s of estado.sondas) dibujo.estela(s, color(s), s.guiones);
+    estado.sondas.forEach((s, i) => dibujo.sonda(s, color(s), i === estado.elegida && estado.sondas.length > 1));
     for (const s of estado.sondas) dibujo.vectores(s, mundo.M, ver, esc.vPx, esc.fPx);
     dibujo.lanzador(mundo, estado.lanz, esc.vPx, estado.sondas.some((s) => s.estado === 'vuelo'));
     if (ver.regla) dibujo.regla(mundo, elegida, dibujo.w < 560 ? 70 : 24);
@@ -581,6 +592,11 @@
   alCambiarTamano();
   ponerReto(si('reto'));
   if (si('proyector')) ponerProyector(true);
+  // Tema: ?tema=claro o ?tema=oscuro manda; si no, el último que se usó en este navegador.
+  let temaGuardado = null;
+  try { temaGuardado = localStorage.getItem('gravitacion.tema'); } catch (e) { /* sin almacenamiento */ }
+  const tema = (q.get('tema') || temaGuardado || 'oscuro').toLowerCase();
+  if (tema === 'claro' || si('claro')) ponerClaro(true);
   if (q.get('varias')) { estado.varias = si('varias'); $('optVarias').checked = estado.varias; }
   const mundoQ = (q.get('mundo') || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); // «Júpiter» → «jupiter»
   if (MUNDOS[mundoQ]) elegirMundo(mundoQ);

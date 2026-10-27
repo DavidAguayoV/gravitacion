@@ -29,6 +29,7 @@
         tinta: v('--ink'), tenue: v('--muted'), linea: v('--line'),
         fuerza: v('--vec'), vel: v('--vel'), acento: v('--acc'),
         fuente: v('--body'), serif: v('--serif'), mono: v('--mono'),
+        sondas: [1, 2, 3, 4, 5].map((k) => v('--s' + k)),
         grosor: parseFloat(v('--grosor')) || 1,
         letra: parseFloat(v('--letra-lienzo')) || 13,
       };

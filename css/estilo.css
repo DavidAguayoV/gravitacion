@@ -21,6 +21,17 @@
   --vel: #6adcf2;   /* velocidad: cian */
   --acc: #eb4789;   /* acento: rosa */
   --ok: #7fd18b;
+  --boton: #131a29;
+  --campo: #0a0f19;
+  --pulsado: #10202a;
+  --sobre-vel: #04131a;               /* texto sobre el botón cian */
+  --flotante: rgba(12, 17, 29, 0.85); /* cajas sobre el lienzo */
+  /* Sondas: un color y un patrón de línea cada una */
+  --s1: #ece8df;
+  --s2: #eb4789;
+  --s3: #7fd18b;
+  --s4: #b79cff;
+  --s5: #f2955a;
   --body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --serif: 'Instrument Serif', Georgia, serif;
   --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
@@ -32,6 +43,34 @@
   --letra-lienzo: 13;   /* tamaño de letra en el lienzo, px */
   --panel-w: 370px;
 }
+
+/* Tema claro: para salas con luz o proyectores que lavan el negro (paleta clara de Mundo Vacío) */
+.claro {
+  color-scheme: light;
+  --bg: #eef1f6;
+  --bg-center: #f8f9fc;
+  --bg-edge: #d9dfe9;
+  --panel: #fbfcfd;
+  --line: #d3d9e2;
+  --control: #9aa4b5;
+  --ink: #121722;
+  --muted: #5d6676;
+  --vec: #b07400;
+  --vel: #00809f;
+  --acc: #9b1d55;
+  --ok: #2e7d3a;
+  --boton: #ffffff;
+  --campo: #ffffff;
+  --pulsado: #e1f1f5;
+  --sobre-vel: #ffffff;
+  --flotante: rgba(251, 252, 253, 0.9);
+  --s1: #121722;
+  --s2: #9b1d55;
+  --s3: #2e7d3a;
+  --s4: #5b3fb5;
+  --s5: #b8501a;
+}
+.claro.proyector { --muted: #4a5262; }
 
 /* Modo proyector: todo más grande y más grueso */
 .proyector {
@@ -112,7 +151,7 @@ body {
   padding: 5px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: rgba(7, 10, 18, 0.7);
+  background: var(--flotante);
   font-size: var(--t-sm);
   white-space: nowrap;
   pointer-events: none;
@@ -132,7 +171,7 @@ body {
   gap: 6px;
   padding: 6px;
   border-radius: 14px;
-  background: rgba(12, 17, 29, 0.85);
+  background: var(--flotante);
   border: 1px solid var(--line);
   backdrop-filter: blur(6px);
 }
@@ -165,7 +204,7 @@ button, select {
   min-height: 40px;
   border-radius: 10px;
   border: 1px solid var(--control);
-  background: #131a29;
+  background: var(--boton);
   padding: 0 12px;
   cursor: pointer;
 }
@@ -177,7 +216,7 @@ button:focus-visible, select:focus-visible, input:focus-visible {
 button.icono { width: 40px; padding: 0; font-size: 16px; line-height: 1; }
 button.principal {
   background: var(--vel);
-  color: #04131a;
+  color: var(--sobre-vel);
   border-color: var(--vel);
   font-weight: 600;
 }
@@ -220,7 +259,7 @@ button[aria-pressed='true'] { border-color: var(--vel); color: var(--vel); }
   align-items: center;
   border: 1px solid var(--control);
   border-radius: 8px;
-  background: #0a0f19;
+  background: var(--campo);
   height: 34px;
   padding: 0 6px;
 }
@@ -273,7 +312,7 @@ input[type='range'] {
   padding: 8px 12px 8px;
   border-radius: 12px;
   border: 1px solid var(--line);
-  background: rgba(12, 17, 29, 0.82);
+  background: var(--flotante);
   backdrop-filter: blur(6px);
   pointer-events: none;
   --alto: 168px;
@@ -312,7 +351,7 @@ input[type='range'] {
 .botones button { text-align: left; font-size: var(--t-sm); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .chips button { min-height: 34px; padding: 0 10px; border-radius: 999px; font-size: var(--t-sm); }
-.botones button[aria-pressed='true'], .chips button[aria-pressed='true'] { background: #10202a; }
+.botones button[aria-pressed='true'], .chips button[aria-pressed='true'] { background: var(--pulsado); }
 
 /* Modo reto: se ocultan v_c, v_e, energías y las situaciones que regalan la respuesta */
 .reto .pista { display: none !important; }
