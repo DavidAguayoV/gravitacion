@@ -1,0 +1,81 @@
+# Gravitación
+
+Simulación para FIS093 · Introducción a la Física (UAI), complemento de la clase 08.
+Se lanzan sondas alrededor de un mundo y se ven, en vivo, la fuerza, la velocidad y la energía.
+
+**En línea:** https://davidaguayov.github.io/gravitacion/
+
+También funciona sin internet: basta abrir `index.html` (no necesita servidor ni instalación).
+
+## Qué hace
+
+- Mundo de masa *M* y radio *R* ajustables. El dibujo está a escala.
+- Sonda lanzable de dos formas: arrastrando la flecha cian (su largo es la rapidez y su
+  dirección, el ángulo) o con los campos de altura, rapidez y ángulo y el botón **Lanzar**.
+- Física: *F* = −(*GMm*/*r*²) r̂, integrada con Runge-Kutta 4 y subpasos. Detecta el impacto
+  con la superficie, cuenta las vueltas y anuncia «Escapó» cuando *E* ≥ 0 y la sonda se aleja.
+- Vectores de fuerza (ámbar) y velocidad (cian), círculo a la altura actual y regla.
+- Panel: *r*, *h*, *v*, *F*, √(*GM*/*r*) y √(2*GM*/*r*) en la posición actual, y *K*, *U* y *E*.
+  Las barras de energía tienen el cero al medio: *U* siempre baja, *K* siempre sube y *E* dice
+  si la sonda queda ligada (*E* < 0), está en el límite (*E* ≈ 0) o escapa (*E* > 0).
+- Notación de la clase: *G* = 6,67 × 10⁻¹¹ N·m²/kg², *U* = −*GMm*/*r*, *v*ₑ = √(2*GM*/*R*).
+
+## Situaciones (en clase)
+
+| Botón | Qué muestra |
+|---|---|
+| Cañón de Newton | Tierra, montaña de 400 km. Tres disparos horizontales: 4 km/s (cae cerca), 6,5 km/s (cae más lejos) y 7,67 km/s (órbita). |
+| Órbita circular | *v* = √(*GM*/*r*) desde 0,1 *R* de altura. *r* no cambia y *E* < 0. |
+| Velocidad de escape | *v* = *v*ₑ desde la superficie a 60°: *E* ≈ 0 y no vuelve. Sirve para decir que el ángulo no importa. |
+| Órbita elíptica | 1,2 veces la rapidez circular: se aleja hasta unas 2,6 veces la distancia de partida y vuelve. Mirar cómo *K* y *U* se reparten con *E* fija. |
+| Se cae | 0,6 veces la rapidez circular: choca. |
+| Escapa con sobra | 1,5 *v*ₑ: *E* > 0, le sobra energía cinética lejos. |
+| Salto en Deimos | 3 m/s hacia arriba. Con los datos reales *v*ₑ ≈ 5,6 m/s: sube unos 2,4 km y vuelve en una hora. |
+| Salto en Bennu | El mismo salto escapa: *v*ₑ ≈ 0,20 m/s (el asteroide de la actividad). |
+
+Salvo el cañón y los saltos, cada situación se arma **sobre el mundo elegido**: elegir la Luna
+y luego «Órbita circular» da la órbita circular de la Luna.
+
+Mundos con datos reales (NASA): Bennu, Deimos, Ceres, Luna, Europa, Marte, Tierra y Júpiter.
+
+## Modo reto
+
+Oculta √(*GM*/*r*), √(2*GM*/*r*), las energías y las situaciones (que regalan la respuesta).
+Los grupos buscan, tanteando con el campo *v*, la rapidez de una órbita circular y la de escape.
+La página avisa «Órbita circular» si *r* varía menos de 1 % en la primera vuelta, y «Escapó»;
+cada hallazgo queda anotado en la lista del reto (mundo, *h*, *v*, ángulo) para informarlo.
+
+Se activa con la casilla **Modo reto** o desde la dirección:
+
+```
+https://davidaguayov.github.io/gravitacion/?reto=1
+https://davidaguayov.github.io/gravitacion/?reto=1&mundo=luna
+```
+
+Otras opciones de la dirección: `?proyector=1` (letra y vectores grandes), `?mundo=marte`,
+`?situacion=canon` (claves: `canon`, `circular`, `escape`, `eliptica`, `cae`, `sobra`, `deimos`,
+`bennu`), `?varias=1`.
+
+Atajos: Espacio pausa, L lanza, R reinicia. En el celular: arrastrar con un dedo la flecha y
+pellizcar para acercar.
+
+## Código
+
+Sin compilación ni dependencias: HTML, CSS y JavaScript en scripts clásicos.
+
+- `js/fisica.js` — el motor: fuerza, RK4, choque, escape, energías. No toca la página.
+- `js/mundos.js` — datos de los mundos y situaciones.
+- `js/formato.js` — números en español (coma decimal, potencias de diez).
+- `js/dibujo.js` — todo lo que se pinta en el lienzo.
+- `js/app.js` — controles, arrastre, bucle de animación y modo reto.
+
+Pruebas:
+
+```
+node tests/verificar.js        # física, sin navegador
+node tests/navegador.js        # en Chromium con Playwright (requiere playwright-core)
+```
+
+`verificar.js` revisa *g* = 9,81 m/s², la tabla de *v*ₑ de la clase, una órbita circular de
+10 vueltas (*r* constante y deriva de energía < 0,1 %; en la práctica ~10⁻¹⁰ %), que con
+*v* = *v*ₑ la sonda no vuelve, la altura máxima de un tiro vertical y los saltos en Deimos y Bennu.
