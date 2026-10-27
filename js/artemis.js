@@ -247,7 +247,7 @@
     } else {
       let texto = ver.texto;
       if (primera && estado.fallidos < MAX_INTENTOS) texto += estado.fallidos ? ` Lo lograron en ${estado.fallidos + 1} intentos.` : ' ¡Al primer intento!';
-      if (primera) texto += ' Prueben «Girar con la Luna»: ahí se ve la vuelta completa alrededor de la Luna.';
+      if (primera) texto += ' Prueben «Girar con la Luna»: ahí se ve la vuelta completa alrededor de la Luna. Y se abrió el modo libre.';
       avisar(ver.ok, texto);
     }
   }
@@ -281,6 +281,23 @@
     else if (estado.fallidos < MAX_INTENTOS) c.textContent = `Intento ${estado.fallidos + 1} de ${MAX_INTENTOS}`;
     else c.textContent = 'Tres intentos: ya pueden ver cómo se hace';
     c.classList.toggle('ok', estado.logros.includes('artemis'));
+    mostrarFinal();
+  }
+
+  /** El modo libre se abre al lograr Artemis II. */
+  function mostrarFinal() {
+    const actual = $('final');
+    const abierto = estado.logros.includes('artemis');
+    const nuevo = document.createElement(abierto ? 'a' : 'p');
+    if (abierto) {
+      nuevo.href = 'libre.html?desde=artemis' + (q.get('tema') ? '&tema=' + q.get('tema') : '');
+      nuevo.textContent = 'Se abrió el modo libre: N cuerpos →';
+    } else {
+      nuevo.textContent = '🔒 Modo libre: se abre al lograr Artemis II.';
+    }
+    nuevo.id = 'final';
+    nuevo.className = 'm-final';
+    actual.replaceWith(nuevo);
   }
 
   function mostrarIntentos() {

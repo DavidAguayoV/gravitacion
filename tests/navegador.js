@@ -198,6 +198,10 @@ async function abrir(b, query, movil) {
         if (!listo || logro !== ok) { bien = false; detalle.push(`reto ${n + 1}, ${v} m/s: ${await p.textContent('#textoAviso')}`); }
       }
     }
+    // Al cambiar de reto, la rapidez vuelve a la inicial: no queda la encontrada en el reto anterior
+    await p.evaluate(() => { window.mision.ponerRapidez(999); window.mision.elegirReto(1); });
+    const vReto = await p.evaluate(() => window.mision.estado.v === window.mision.mision.vInicial);
+    if (!vReto) { bien = false; detalle.push('la rapidez no volvió a la inicial al cambiar de reto'); }
     const marcados = await p.evaluate(() => document.querySelectorAll('.m-boton-reto.logrado').length);
     const ancho = await p.evaluate(() => document.documentElement.scrollWidth);
     revisar(`misión ${m}: cada reto falla y se logra cuando debe`, bien && marcados === 3, detalle.join(' | '));
@@ -244,7 +248,49 @@ async function abrir(b, query, movil) {
     const volver = await p.evaluate(() => document.getElementById('volver').getAttribute('href'));
     revisar('Artemis: vuelve a su misión, sin desplazamiento horizontal ni errores',
       volver === 'mision.html?m=orbitar' && ancho <= 390 && p.errores.length === 0, `${volver} ${ancho} ${p.errores.join(' | ')}`);
+    const libreAbierto = await p.evaluate(() => document.getElementById('final').getAttribute('href') || '');
+    revisar('Artemis: al lograrlo se abre el modo libre', libreAbierto.startsWith('libre.html'), libreAbierto);
     await p.screenshot({ path: path.join(CAPTURAS, 'artemis.png') });
+    await p.close();
+  }
+
+  // 7c. Modo libre: todas las escenas corren; Euler cambia la energía y RK4 no; agregar un cuerpo
+  {
+    const p = await abrir(b, '', true);
+    await p.goto(PAGINA.replace('index.html', 'libre.html') + '?desde=artemis');
+    const escenas = await p.evaluate(() => Object.keys(libre.ESCENAS));
+    let bien = true;
+    for (const k of escenas) {
+      await p.evaluate((k) => libre.cargar(k), k);
+      await p.waitForTimeout(1500);
+      const ok = await p.evaluate(() => libre.estado.sis.t > 0 && libre.estado.sis.c.every((c) => isFinite(c.x)));
+      if (!ok) bien = false;
+    }
+    revisar('modo libre: las cinco escenas corren', bien && escenas.length === 5, escenas.join(', '));
+    await p.evaluate(() => libre.cargar('tierraLuna'));
+    await p.waitForTimeout(3000);
+    const dRK4 = await p.evaluate(() => Math.abs(Grav.NCuerpos.energia(libre.estado.sis) / libre.estado.E0 - 1));
+    await p.tap('[data-metodo=euler]');
+    await p.tap('[data-paso="0.05"]');
+    await p.evaluate(() => libre.cargar('tierraLuna'));
+    await p.waitForTimeout(3000);
+    const dEuler = await p.evaluate(() => Math.abs(Grav.NCuerpos.energia(libre.estado.sis) / libre.estado.E0 - 1));
+    revisar('modo libre: con Euler la energía cambia; con RK4 no', dRK4 < 1e-6 && dEuler > 0.02,
+      `RK4 ${dRK4.toExponential(1)}, Euler ${dEuler.toFixed(3)}`);
+    await p.tap('[data-metodo=rk4]');
+    await p.tap('[data-paso="0.01"]');
+    await p.evaluate(() => libre.cargar('solar'));
+    await p.tap('#agregar');
+    const caja = await p.locator('#lienzo').boundingBox();
+    await p.touchscreen.tap(caja.x + caja.width / 2 + 60, caja.y + caja.height / 2 - 80);
+    await p.waitForTimeout(400);
+    const n = await p.evaluate(() => libre.estado.sis.c.length);
+    await p.evaluate(() => libre.ponerMasa(libre.estado.sis.c[0], 0.5 * 1.989e30));
+    const filas = await p.evaluate(() => document.querySelectorAll('#cuerpos li').length);
+    const ancho = await p.evaluate(() => document.documentElement.scrollWidth);
+    revisar('modo libre: un toque agrega un cuerpo y la lista lo muestra; sin desplazamiento ni errores',
+      n === 6 && filas === 6 && ancho <= 390 && p.errores.length === 0, `${n} cuerpos, ${filas} filas, ${ancho} px ${p.errores.join(' | ')}`);
+    await p.screenshot({ path: path.join(CAPTURAS, 'libre.png') });
     await p.close();
   }
 

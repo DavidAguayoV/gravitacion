@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Gravitación · Modo libre</title>
+  <meta name="description" content="Modo libre: N cuerpos que se atraen todos con todos. Cambien masas, agreguen cuerpos y comparen Euler con RK4. FIS093, UAI.">
+  <meta name="theme-color" content="#070a12">
+  <link rel="stylesheet" href="css/estilo.css?v=5">
+  <link rel="stylesheet" href="css/mision.css?v=5">
+</head>
+<body>
+  <!-- Se abre al lograr Artemis II. Todos los cuerpos tienen masa y se atraen entre ellos. -->
+  <main class="mision libre">
+    <header class="m-cabeza">
+      <div class="m-titulo">
+        <a href="./" class="m-sitio" id="volver">Gravitación</a>
+        <h1>Modo libre</h1>
+      </div>
+      <nav class="l-escenas" id="escenas" aria-label="Escenas"></nav>
+      <p class="m-reto" id="textoEscena"></p>
+    </header>
+
+    <section class="m-escena" aria-label="Simulación">
+      <canvas id="lienzo" aria-label="Los cuerpos y sus trayectorias. En pausa se arrastran los cuerpos y la punta de su flecha de velocidad."></canvas>
+      <div class="l-flotan">
+        <button class="icono" id="alejar" aria-label="Alejar">−</button>
+        <button class="icono" id="acercar" aria-label="Acercar">+</button>
+      </div>
+      <p class="m-vivo" id="vivo"></p>
+    </section>
+
+    <section class="m-mando" aria-label="Controles">
+      <div class="m-aviso" id="aviso" aria-live="polite"><p id="textoAviso"></p></div>
+      <div class="l-botones">
+        <button class="principal" id="pausa">Pausa</button>
+        <button id="agregar">+ Cuerpo</button>
+        <button id="reiniciar">Reiniciar</button>
+      </div>
+
+      <h2 class="l-sub">Cuerpos <span id="cuantos"></span></h2>
+      <ul class="l-cuerpos" id="cuerpos"></ul>
+
+      <h2 class="l-sub">Cómo se calcula</h2>
+      <div class="l-opcion" role="group" aria-label="Método">
+        <span>Método</span>
+        <button data-metodo="rk4" aria-pressed="true">RK4</button>
+        <button data-metodo="euler" aria-pressed="false">Euler</button>
+      </div>
+      <div class="l-opcion" role="group" aria-label="Largo del paso">
+        <span>Paso</span>
+        <button data-paso="0.002" aria-pressed="false">Fino</button>
+        <button data-paso="0.01" aria-pressed="true">Normal</button>
+        <button data-paso="0.05" aria-pressed="false">Grueso</button>
+      </div>
+      <div class="l-opcion" role="group" aria-label="Rapidez del tiempo">
+        <span>Tiempo</span>
+        <button data-tiempo="0.25" aria-pressed="false">Lento</button>
+        <button data-tiempo="1" aria-pressed="true">Normal</button>
+        <button data-tiempo="4" aria-pressed="false">Rápido</button>
+      </div>
+      <label class="l-casilla"><input type="checkbox" id="seguirCM" checked> Seguir el centro de masa</label>
+
+      <details class="l-explica" id="explica">
+        <summary>¿Cómo se calculan las trayectorias?</summary>
+        <ol>
+          <li><b>Cada par de cuerpos se atrae.</b> La fuerza es <i class="serif">F</i> = <i class="serif">G m</i><sub>1</sub><i class="serif">m</i><sub>2</sub>/<i class="serif">r</i>², a lo largo de la línea que los une. La aceleración de un cuerpo es la suma de lo que le hacen todos los demás:
+            <span class="l-formula"><b>a</b><sub><i>i</i></sub> = Σ<sub><i>j</i></sub> <i>G m</i><sub><i>j</i></sub> (<b>r</b><sub><i>j</i></sub> − <b>r</b><sub><i>i</i></sub>) / |<b>r</b><sub><i>j</i></sub> − <b>r</b><sub><i>i</i></sub>|³</span>
+            Su propia masa se cancela: por eso todo cae igual.</li>
+          <li><b>Con tres cuerpos o más no hay una fórmula para la trayectoria.</b> El computador avanza en pasos cortos de tiempo Δ<i>t</i>: con la posición y la velocidad de ahora estima las de un instante después, y repite. Aquí son miles de pasos por segundo.</li>
+          <li><b>Euler, la idea más simple:</b>
+            <span class="l-formula"><b>r</b> ← <b>r</b> + <b>v</b> Δ<i>t</i> &nbsp;&nbsp; <b>v</b> ← <b>v</b> + <b>a</b> Δ<i>t</i></span>
+            Usa la aceleración del comienzo del paso como si no cambiara. En una órbita sí cambia de dirección: en cada paso el cuerpo se va un poco hacia afuera, la órbita se abre en espiral y la energía total crece sola. Pruébenlo: Euler con paso grueso.</li>
+          <li><b>Runge-Kutta de orden 4 (RK4)</b> mide cuatro veces, en cada paso, la velocidad (que hace avanzar la posición) y la aceleración (que hace avanzar la velocidad):
+            <span class="l-formula l-pasos"><i>k</i><sub>1</sub> al comienzo · <i>k</i><sub>2</sub> a mitad de paso, avanzando con <i>k</i><sub>1</sub> · <i>k</i><sub>3</sub> a mitad de paso, avanzando con <i>k</i><sub>2</sub> · <i>k</i><sub>4</sub> al final, avanzando con <i>k</i><sub>3</sub></span>
+            y avanza con el promedio (<i>k</i><sub>1</sub> + 2<i>k</i><sub>2</sub> + 2<i>k</i><sub>3</sub> + <i>k</i><sub>4</sub>)/6, como la regla de Simpson. Así toma en cuenta cómo cambian la velocidad y la aceleración dentro del paso.</li>
+          <li><b>¿Cuánto mejor?</b> Si el paso se hace la mitad de largo, el error de Euler baja a la mitad; el de RK4 baja 16 veces (2⁴). En tres vueltas de la Luna con paso normal, la energía cambia 25 % con Euler y menos de una millonésima con RK4.</li>
+          <li><b>Paso que se adapta.</b> Cuando dos cuerpos se acercan, las fuerzas cambian rápido y el paso se acorta solo: Δ<i>t</i> es una fracción de √(<i>r</i>³/<i>G</i>(<i>m</i><sub>1</sub> + <i>m</i><sub>2</sub>)) del par más cercano.</li>
+          <li><b>La prueba de calidad es la energía.</b> Sin roce, la energía total se conserva: el número bajo el dibujo dice cuánto cambió desde el inicio. Si dos cuerpos se tocan, se funden en uno y se conserva el momentum (ahí sí se pierde energía, como en todo choque plástico).</li>
+        </ol>
+      </details>
+    </section>
+  </main>
+
+  <!-- Scripts clásicos (no módulos): así la página funciona abriendo el archivo sin servidor. -->
+  <!-- ?v=5: al cambiar el código, subir el número para que el navegador no use la copia vieja -->
+  <script src="js/fisica.js?v=5"></script>
+  <script src="js/formato.js?v=5"></script>
+  <script src="js/dibujo.js?v=5"></script>
+  <script src="js/ncuerpos.js?v=5"></script>
+  <script src="js/libre.js?v=5"></script>
+</body>
+</html>

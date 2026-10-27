@@ -138,5 +138,52 @@ for (const angulo of [90, 0]) {
     `${((s.dLmin - TL.RL) / 1e3).toFixed(0)} km sobre la Luna, ${(s.t / 86400).toFixed(1)} días`);
 }
 
+// 10. N cuerpos (modo libre): RK4 conserva la energía y Euler no; el ocho vuelve a su lugar;
+//     un choque funde dos cuerpos y conserva el momentum.
+{
+  require('../js/ncuerpos.js');
+  const N = globalThis.Grav.NCuerpos;
+  const d = 3.844e8, MT = 5.97e24, ML = 7.35e22;
+  const tl = () => {
+    const s = N.crear([
+      { nombre: 'Tierra', m: MT, R: 6.37e6, x: 0, y: 0, vx: 0, vy: 0 },
+      { nombre: 'Luna', m: ML, R: 1.74e6, x: d, y: 0, vx: 0, vy: Math.sqrt((G * (MT + ML)) / d) },
+    ]);
+    N.alCentro(s);
+    return s;
+  };
+  const deriva = (metodo) => {
+    const s = tl(), E0 = N.energia(s), T = 27.3 * 86400;
+    for (let i = 0; i < 300; i++) N.avanzar(s, (3 * T) / 300, metodo, 0.01);
+    return Math.abs((N.energia(s) - E0) / E0);
+  };
+  const dRK4 = deriva('rk4'), dEuler = deriva('euler');
+  revisar('N cuerpos: en 3 vueltas de la Luna, RK4 conserva la energía (< 0,0001 %)', dRK4 < 1e-6, pct(dRK4));
+  revisar('N cuerpos: con el mismo paso, Euler la cambia más de 10 %', dEuler > 0.1, pct(dEuler));
+
+  const AU = 1.496e11, M = 1.989e30, V = Math.sqrt((G * M) / AU);
+  const x1 = [0.97000436, -0.24308753], v3 = [-0.93240737, -0.86473146];
+  const s = N.crear([
+    { nombre: 'A', m: M, R: 6.96e8, x: x1[0] * AU, y: x1[1] * AU, vx: (-v3[0] / 2) * V, vy: (-v3[1] / 2) * V },
+    { nombre: 'B', m: M, R: 6.96e8, x: -x1[0] * AU, y: -x1[1] * AU, vx: (-v3[0] / 2) * V, vy: (-v3[1] / 2) * V },
+    { nombre: 'C', m: M, R: 6.96e8, x: 0, y: 0, vx: v3[0] * V, vy: v3[1] * V },
+  ]);
+  const P = 6.32591398 * (AU / V);
+  for (let i = 0; i < 300; i++) N.avanzar(s, P / 300, 'rk4', 0.01);
+  const err = Math.hypot(s.c[0].x / AU - x1[0], s.c[0].y / AU - x1[1]);
+  revisar('N cuerpos: el ocho vuelve a su lugar tras un período', err < 1e-3, err.toExponential(2) + ' UA');
+
+  const c = N.crear([
+    { nombre: 'a', m: 2e24, R: 1e6, x: 0, y: 0, vx: 100, vy: 0 },
+    { nombre: 'b', m: 1e24, R: 1e6, x: 1.5e6, y: 0, vx: -50, vy: 30 },
+  ]);
+  const p0 = [2e24 * 100 + 1e24 * -50, 1e24 * 30];
+  N.avanzar(c, 1, 'rk4', 0.01);
+  const b = c.c[0];
+  revisar('N cuerpos: un choque funde los cuerpos y conserva el momentum',
+    c.c.length === 1 && Math.abs(b.m * b.vx - p0[0]) / Math.abs(p0[0]) < 1e-3 && Math.abs(b.m * b.vy - p0[1]) / p0[1] < 1e-2,
+    `${c.c.length} cuerpo, ${c.eventos[0] || ''}`);
+}
+
 console.log(fallas ? `\n${fallas} prueba(s) fallaron.` : '\nTodas las pruebas pasan.');
 process.exit(fallas ? 1 : 0);

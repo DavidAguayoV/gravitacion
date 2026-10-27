@@ -6,8 +6,8 @@
   <title>Gravitación · Misión final: Artemis II</title>
   <meta name="description" content="Misión final: llevar una nave por detrás de la Luna y de vuelta a la Tierra sin encender los motores. FIS093, UAI.">
   <meta name="theme-color" content="#070a12">
-  <link rel="stylesheet" href="css/estilo.css?v=4">
-  <link rel="stylesheet" href="css/mision.css?v=4">
+  <link rel="stylesheet" href="css/estilo.css?v=5">
+  <link rel="stylesheet" href="css/mision.css?v=5">
 </head>
 <body>
   <!-- La parte libre que se abre al terminar una misión. La Tierra y la Luna se mueven; la nave siente a las dos. -->
@@ -18,6 +18,8 @@
         <h1>Misión final: Artemis II</h1>
       </div>
       <p class="m-reto"><b>Lleven la nave por detrás de la Luna y de vuelta a la Tierra</b>, con un solo impulso al partir: después, los motores quedan apagados. Elijan la rapidez y dónde está la Luna al salir. <span class="a-cuenta" id="cuentaIntentos"></span></p>
+      <!-- Se abre al lograr Artemis II -->
+      <p class="m-final" id="final"></p>
     </header>
 
     <section class="m-escena" aria-label="Simulación">
@@ -66,11 +68,11 @@
   </main>
 
   <!-- Scripts clásicos (no módulos): así la página funciona abriendo el archivo sin servidor. -->
-  <!-- ?v=4: al cambiar el código, subir el número para que el navegador no use la copia vieja -->
-  <script src="js/fisica.js?v=4"></script>
-  <script src="js/formato.js?v=4"></script>
-  <script src="js/dibujo.js?v=4"></script>
-  <script src="js/tierraluna.js?v=4"></script>
-  <script src="js/artemis.js?v=4"></script>
+  <!-- ?v=5: al cambiar el código, subir el número para que el navegador no use la copia vieja -->
+  <script src="js/fisica.js?v=5"></script>
+  <script src="js/formato.js?v=5"></script>
+  <script src="js/dibujo.js?v=5"></script>
+  <script src="js/tierraluna.js?v=5"></script>
+  <script src="js/artemis.js?v=5"></script>
 </body>
 </html>

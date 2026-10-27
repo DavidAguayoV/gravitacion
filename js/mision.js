@@ -225,6 +225,9 @@
     estado.n = i;
     estado.sonda = null;
     estado.viejas = [];
+    // Cada reto parte de la misma rapidez: si quedara la del reto anterior, el siguiente
+    // (por ejemplo, escapar de lado) se resolvería sin darse cuenta.
+    ponerRapidez(mision.vInicial);
     ocultarAviso();
     $('pista').hidden = true;
     $('botonPista').setAttribute('aria-expanded', 'false');

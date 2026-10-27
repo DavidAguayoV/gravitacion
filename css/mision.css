@@ -188,3 +188,48 @@ a.m-final {
   background: color-mix(in srgb, var(--panel) 85%, transparent);
 }
 .a-vista[aria-pressed='true'] { border-color: var(--acc); color: var(--acc); }
+
+/* ---------- Modo libre: N cuerpos ---------- */
+
+.l-escenas { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 8px; }
+.l-escena { min-height: 36px; padding: 0 12px; font-size: var(--t-sm); }
+.l-escena[aria-pressed='true'], .l-opcion button[aria-pressed='true'], #agregar[aria-pressed='true'] {
+  border-color: var(--vel);
+  color: var(--vel);
+}
+.l-flotan { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; }
+.l-flotan .icono { width: 40px; min-height: 40px; font-size: 20px; background: color-mix(in srgb, var(--panel) 85%, transparent); }
+.m-vivo.l-mala { color: var(--vec); }
+
+.l-botones { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px; }
+.l-botones button { min-height: 48px; }
+.l-sub { margin: 16px 0 6px; font-size: var(--t-sm); font-weight: 600; color: var(--muted); }
+
+.l-cuerpos { list-style: none; margin: 0; padding: 0; }
+.l-cuerpos li {
+  display: grid;
+  grid-template-columns: 12px minmax(52px, 1fr) minmax(0, 1.6fr) 38px 38px 34px;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+.l-punto { width: 12px; height: 12px; border-radius: 50%; }
+.l-nombre { font-size: var(--t-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.l-masa { height: 40px; min-width: 0; }
+.l-masa input { font-size: 16px; min-width: 0; }
+.l-masa .u { font-size: var(--t-xs); }
+.l-mini { min-height: 40px; padding: 0; font-size: var(--t-sm); }
+.l-quitar { color: var(--muted); }
+
+.l-opcion { display: flex; align-items: center; gap: 6px; margin: 6px 0; }
+.l-opcion span { width: 4.2em; color: var(--muted); font-size: var(--t-sm); }
+.l-opcion button { flex: 1; min-height: 40px; padding: 0 6px; font-size: var(--t-sm); }
+.l-casilla { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; font-size: var(--t-sm); color: var(--muted); }
+
+.l-explica { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; font-size: var(--t-sm); line-height: 1.5; }
+.l-explica summary { cursor: pointer; font-weight: 600; color: var(--vel); padding: 4px 0; }
+.l-explica ol { padding-left: 1.3em; margin: 8px 0 0; }
+.l-explica li { margin: 0 0 10px; }
+.l-explica i { font-family: var(--serif); }
+.l-formula { display: block; margin: 6px 0; padding: 6px 10px; border-left: 2px solid var(--line); font-family: var(--serif); overflow-x: auto; }
+.l-pasos { font-family: var(--body); }

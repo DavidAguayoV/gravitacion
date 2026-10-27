@@ -77,6 +77,17 @@ de retorno libre: rodear la Luna por detrás y volver a entrar al aire. Cada int
 fallidos aparece «Ver cómo se hace» (10,95 km/s con la Luna a 128°). Hay una lupa con la Luna a
 escala y una vista que gira con la Luna. Desafíos libres: impacto lunar y honda gravitacional.
 
+### Modo libre: N cuerpos (`libre.html`)
+
+Se abre en el celular al lograr Artemis II. Todos los cuerpos tienen masa y se atraen entre ellos
+(`js/ncuerpos.js`). Cinco escenas: Tierra y Luna, sistema solar interior, estrella doble con planeta,
+el ocho de Chenciner y Montgomery, y el problema pitagórico 3-4-5. Se cambian masas (campo, ÷2, ×2),
+se agregan cuerpos (un toque: órbita circular alrededor del más pesado; arrastrar: la velocidad
+dibujada) y, en pausa, se arrastran cuerpos y flechas de velocidad. Se elige el método (RK4 o Euler),
+el paso (fino, normal, grueso) y la rapidez del tiempo; bajo el dibujo se ve cuánto cambió la energía.
+Los choques funden los cuerpos conservando el momentum. La explicación de Euler y RK4 está en la
+página y, más larga, en el apunte `2026_2_FIS093/Clases/apuntes_como_calcula_la_simulacion.tex`.
+
 Hoja para la clase (v2, 4 páginas: una para proyectar con los tres QR y una por misión):
 `2026_2_FIS093/Clases/actividad_simulacion_v2_hoja.tex` y su pauta `actividad_simulacion_v2_pauta.tex`.
 
@@ -108,6 +119,7 @@ Sin compilación ni dependencias: HTML, CSS y JavaScript en scripts clásicos.
 - `js/app.js` — controles, arrastre, bucle de animación y modo reto.
 - `js/mision.js` y `css/mision.css` — las misiones: retos, jueces y la página para el celular.
 - `js/tierraluna.js` y `js/artemis.js` — la misión final: motor Tierra–Luna y su página.
+- `js/ncuerpos.js` y `js/libre.js` — el modo libre: motor de N cuerpos (RK4 y Euler) y su página.
 
 Pruebas:
 
