@@ -15,6 +15,17 @@
       <header class="marca"><h1>Gravitación</h1><span id="nombreMundo"></span></header>
       <div class="estado" id="estado" aria-live="polite"></div>
 
+      <!-- Barras de energía: K, U y E = K + U de la sonda elegida, con el cero al medio -->
+      <figure class="energia pista" id="energia" aria-label="Energía de la sonda">
+        <figcaption>Energía</figcaption>
+        <div class="barras">
+          <div class="barra" data-k="K"><div class="relleno c-k" id="bK"></div></div>
+          <div class="barra" data-k="U"><div class="relleno c-u" id="bU"></div></div>
+          <div class="barra" data-k="E"><div class="relleno c-e" id="bE"></div></div>
+        </div>
+        <p class="tipoE" id="tipoE"></p>
+      </figure>
+
       <div class="zoom">
         <button class="icono" id="acercar" aria-label="Acercar">+</button>
         <button class="icono" id="alejar" aria-label="Alejar">−</button>
@@ -89,6 +100,9 @@
           <div class="dato"><dt>fuerza <i>F</i> = <i>GMm</i>/<i>r</i>²</dt><dd id="dF" class="c-fuerza">—</dd></div>
           <div class="dato pista"><dt>órbita circular √(<i>GM</i>/<i>r</i>)</dt><dd id="dVc">—</dd></div>
           <div class="dato pista"><dt>escape √(2<i>GM</i>/<i>r</i>)</dt><dd id="dVe">—</dd></div>
+          <div class="dato pista sep"><dt>cinética <i>K</i> = ½<i>mv</i>²</dt><dd id="dK" class="c-k">—</dd></div>
+          <div class="dato pista"><dt>potencial <i>U</i> = −<i>GMm</i>/<i>r</i></dt><dd id="dU" class="c-u">—</dd></div>
+          <div class="dato pista"><dt>total <i>E</i> = <i>K</i> + <i>U</i></dt><dd id="dE">—</dd></div>
         </dl>
       </section>
 

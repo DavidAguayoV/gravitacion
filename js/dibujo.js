@@ -99,9 +99,13 @@
       ctx.lineCap = 'butt';
     }
 
+    /** Texto en el lienzo. Nunca se sale por los costados: si no cabe, se corre hacia adentro. */
     texto(t, x, y, color, alinear = 'left', tam = 1, base = 'middle') {
       const { ctx } = this;
       ctx.font = `${this.c.letra * tam}px ${this.c.fuente}`;
+      const ancho = ctx.measureText(t).width;
+      const izq = alinear === 'left' ? x : alinear === 'right' ? x - ancho : x - ancho / 2;
+      x += Math.max(0, 6 - izq) - Math.max(0, izq + ancho - (this.w - 6));
       ctx.fillStyle = color;
       ctx.textAlign = alinear;
       ctx.textBaseline = base;

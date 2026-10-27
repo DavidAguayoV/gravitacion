@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  const { MUNDOS, fmt, crearSonda, avanzar, vEscape } = Grav;
+  const { MUNDOS, fmt, crearSonda, avanzar, vEscape, energias, escalaEnergia, tipoEnergia } = Grav;
   const $ = (id) => document.getElementById(id);
 
   // Colores y patrones de línea de las sondas: se distinguen aunque no se vean los colores.
@@ -86,6 +86,8 @@
   function cambiarMundo(cambios) {
     Object.assign(estado.mundo, cambios);
     estado.lanz.h = Math.min(estado.lanz.h, H_MAX * estado.mundo.R);
+    // Con otro mundo cambia la profundidad del pozo: se rehace la escala de las barras.
+    for (const s of estado.sondas) s.escalaE = escalaEnergia(s, estado.mundo);
     // Si el mundo quedó muy grande o muy chico para la vista, se vuelve a encuadrar.
     const rp = estado.mundo.R * dibujo.escala;
     const lado = Math.min(dibujo.w, dibujo.h);
@@ -123,6 +125,7 @@
     const k = estado.creadas++ % COLORES.length;
     s.color = COLORES[k];
     s.guiones = GUIONES[k];
+    s.escalaE = escalaEnergia(s, mundo);
     estado.sondas.push(s);
     estado.elegida = estado.sondas.length - 1;
     estado.autoVista = true;
@@ -136,6 +139,7 @@
       const n = crearSonda(estado.mundo, L.h, L.v, L.angulo, L.m);
       n.color = s.color;
       n.guiones = s.guiones;
+      n.escalaE = escalaEnergia(n, estado.mundo);
       return n;
     });
     estado.autoVista = true;
@@ -321,6 +325,31 @@
     $('dF').innerHTML = fmt.numero(F, 3, true) + ' N';
     $('dVc').innerHTML = fmt.rapidez(Grav.vCircular(mundo.M, r), true);
     $('dVe').innerHTML = fmt.rapidez(vEscape(mundo.M, r), true);
+    const { K, U, E } = energias(s, mundo.M);
+    $('dK').innerHTML = fmt.numero(K, 3, true) + ' J';
+    $('dU').innerHTML = fmt.numero(U, 3, true) + ' J';
+    $('dE').innerHTML = fmt.numero(E, 3, true) + ' J';
+    mostrarBarras(s, K, U, E);
+  }
+
+  const TIPO_E = { ligada: 'E < 0 · ligada', limite: 'E ≈ 0 · en el límite', libre: 'E > 0 · escapa' };
+
+  /** Barras de K, U y E: hacia arriba si la energía es positiva, hacia abajo si es negativa. */
+  function mostrarBarras(s, K, U, E) {
+    const escala = s.escalaE || escalaEnergia(s, estado.mundo);
+    const poner = (id, x) => {
+      const el = $(id);
+      const f = Math.min(1, Math.abs(x) / escala) * 50; // % del alto total (la mitad es el cero)
+      el.style.height = f + '%';
+      el.style.top = x >= 0 ? 50 - f + '%' : '50%';
+    };
+    poner('bK', K);
+    poner('bU', U);
+    poner('bE', E);
+    const tipo = tipoEnergia(E, s, estado.mundo.M);
+    const p = $('tipoE');
+    p.textContent = TIPO_E[tipo];
+    p.className = 'tipoE ' + tipo;
   }
 
   // ---------- Bucle de animación ----------

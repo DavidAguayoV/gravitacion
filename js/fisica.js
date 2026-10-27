@@ -206,24 +206,22 @@
   }
 
   /**
-   * Energía más grande (en valor absoluto) que puede tener K o U durante el vuelo.
-   * Sirve para fijar la escala de las barras en todo el lanzamiento.
-   * Se calcula con la distancia mínima de la cónica (perigeo), o R si choca antes.
+   * Energía más grande (en valor absoluto) que pueden alcanzar K o U en esta trayectoria.
+   * Fija la escala de las barras durante todo el vuelo: así se ve que E no cambia.
+   * Se calcula con la distancia mínima de la cónica (perigeo), o con R si choca antes.
    */
   function escalaEnergia(s, mundo) {
     const GM = G * mundo.M;
-    const { lanzamiento: L, r0 } = s;
-    const rad = (L.angulo * Math.PI) / 180;
-    const e = 0.5 * L.v * L.v - GM / r0;                 // energía por kg
-    const hM = r0 * L.v * Math.cos(rad);                  // momento angular por kg, r × v
+    const r = Math.hypot(s.x, s.y);
+    const e = 0.5 * (s.vx * s.vx + s.vy * s.vy) - GM / r; // energía por kg
+    const hM = s.x * s.vy - s.y * s.vx;                    // momento angular por kg, r × v
     // Perigeo: donde la rapidez radial se anula, raíz menor de  e r² + GM r − h²/2 = 0
     let rp;
-    if (Math.abs(e) < 1e-12 * (GM / r0)) rp = (hM * hM) / (2 * GM);
+    if (Math.abs(e) < 1e-12 * (GM / r)) rp = (hM * hM) / (2 * GM);
     else rp = (-GM + Math.sqrt(GM * GM + 2 * e * hM * hM)) / (2 * e);
-    if (!(rp > 0) || rp > r0) rp = r0;
-    const rMin = Math.max(mundo.R, rp);
-    const U = (GM * L.m) / rMin;
-    return Math.max(U, e * L.m + U);
+    if (!(rp > 0) || rp > r) rp = r;
+    const U = (GM * s.m) / Math.max(mundo.R, rp); // |U| más grande
+    return Math.max(U, e * s.m + U);              // K más grande = E + |U|
   }
 
   Object.assign(Grav, {
