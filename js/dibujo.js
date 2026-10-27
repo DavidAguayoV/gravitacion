@@ -302,8 +302,10 @@
      * Flecha de lanzamiento: sale del punto de partida y muestra la velocidad que tendrá la
      * sonda. El círculo en la punta es el asa para arrastrarla.
      */
-    lanzador(m, L, vPx) {
+    lanzador(m, L, vPx, tenue) {
       const [x0, y0] = this.aPx(0, m.R + L.h);
+      // Con una sonda en vuelo, el lanzador se atenúa para no taparla
+      this.ctx.globalAlpha = tenue ? 0.35 : 1;
       const rad = (L.angulo * Math.PI) / 180;
       const largo = L.v * vPx;
       const x1 = x0 + largo * Math.cos(rad);
@@ -319,6 +321,7 @@
       ctx.beginPath();
       ctx.arc(x0, y0, 3.5 * this.c.grosor, 0, 2 * Math.PI);
       ctx.fill();
+      ctx.globalAlpha = 1;
       return [x1, y1];
     }
   }

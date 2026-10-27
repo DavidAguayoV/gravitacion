@@ -132,6 +132,7 @@
     s.escalaE = escalaEnergia(s, mundo);
     estado.sondas.push(s);
     estado.elegida = estado.sondas.length - 1;
+    listarSondas();
     estado.autoVista = true;
     ponerPlay(true);
   }
@@ -147,7 +148,29 @@
       return n;
     });
     estado.autoVista = true;
+    listarSondas();
     ponerPlay(true);
+  }
+
+  /** Botones para elegir sonda (solo si hay más de una): muestran su línea y su rapidez inicial. */
+  function listarSondas() {
+    const caja = $('listaSondas');
+    caja.innerHTML = '';
+    if (estado.sondas.length < 2) return;
+    estado.sondas.forEach((s, i) => {
+      const b = document.createElement('button');
+      b.setAttribute('aria-pressed', String(i === estado.elegida));
+      b.innerHTML = `<svg viewBox="0 0 22 8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" stroke="${s.color}"
+        stroke-width="2" stroke-dasharray="${s.guiones.join(' ')}"/></svg>${fmt.rapidez(s.lanzamiento.v)}`;
+      b.addEventListener('click', () => elegirSonda(i));
+      caja.appendChild(b);
+    });
+  }
+
+  function elegirSonda(i) {
+    estado.elegida = i;
+    estado.autoVista = true;
+    listarSondas();
   }
 
   function borrarEstelas() {
@@ -238,7 +261,14 @@
     if (sobreAsa(p, e.pointerType === 'touch')) {
       arrastre = { moved: false };
       lienzo.classList.add('arrastrando');
+      return;
     }
+    // Tocar una sonda la elige
+    const radio = e.pointerType === 'touch' ? 30 : 16;
+    estado.sondas.forEach((s, i) => {
+      const [x, y] = dibujo.aPx(s.x, s.y);
+      if (Math.hypot(p[0] - x, p[1] - y) < radio) elegirSonda(i);
+    });
   });
 
   lienzo.addEventListener('pointermove', (e) => {
@@ -321,6 +351,7 @@
   function elegirMundo(clave, conLanzamiento = true) {
     estado.mundo = { ...MUNDOS[clave] };
     estado.sondas = [];
+    listarSondas();
     if (conLanzamiento) {
       const v = vEscape(estado.mundo.M, estado.mundo.R);
       estado.lanz.h = 0;
@@ -513,7 +544,7 @@
     for (const s of estado.sondas) dibujo.estela(s, s.color, s.guiones);
     estado.sondas.forEach((s, i) => dibujo.sonda(s, s.color, i === estado.elegida && estado.sondas.length > 1));
     for (const s of estado.sondas) dibujo.vectores(s, mundo.M, ver, esc.vPx, esc.fPx);
-    dibujo.lanzador(mundo, estado.lanz, esc.vPx);
+    dibujo.lanzador(mundo, estado.lanz, esc.vPx, estado.sondas.some((s) => s.estado === 'vuelo'));
     if (ver.regla) dibujo.regla(mundo, elegida, dibujo.w < 560 ? 70 : 24);
   }
 
