@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Gravitación</title>
+  <meta name="description" content="Lanza sondas alrededor de un mundo: fuerza, velocidad, órbitas, escape y energía. FIS093, UAI.">
+  <meta name="theme-color" content="#070a12">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <main class="app">
+    <section class="escena" aria-label="Simulación">
+      <canvas id="lienzo" aria-label="Mundo y sondas. Arrastra la flecha cian para lanzar."></canvas>
+      <header class="marca"><h1>Gravitación</h1><span id="nombreMundo"></span></header>
+      <div class="estado" id="estado" aria-live="polite"></div>
+
+      <div class="zoom">
+        <button class="icono" id="acercar" aria-label="Acercar">+</button>
+        <button class="icono" id="alejar" aria-label="Alejar">−</button>
+        <button class="icono" id="encuadrar" aria-label="Encuadrar" title="Encuadrar">⤢</button>
+      </div>
+
+      <div class="tiempo">
+        <button class="icono" id="play" aria-label="Pausa">❚❚</button>
+        <button class="icono" id="reiniciar" aria-label="Reiniciar" title="Reiniciar">↺</button>
+        <select id="rapidezTiempo" aria-label="Rapidez del tiempo">
+          <option value="1">×1</option>
+          <option value="10">×10</option>
+          <option value="100">×100</option>
+          <option value="1000">×1000</option>
+          <option value="10000">×10⁴</option>
+          <option value="100000">×10⁵</option>
+        </select>
+        <span class="reloj" id="reloj">t = 0 s</span>
+        <button class="icono" id="borrar" aria-label="Borrar estelas" title="Borrar estelas">⌫</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <section class="grupo">
+        <h2>Mundo</h2>
+        <div class="control">
+          <label for="rangoM">Masa <i>M</i></label>
+          <input type="range" id="rangoM" min="0" max="1000" step="1">
+          <span class="campo"><input id="campoM" inputmode="decimal" aria-label="Masa del mundo en kg"><span class="u">kg</span></span>
+        </div>
+        <div class="control">
+          <label for="rangoR">Radio <i>R</i></label>
+          <input type="range" id="rangoR" min="0" max="1000" step="1">
+          <span class="campo"><input id="campoR" inputmode="decimal" aria-label="Radio del mundo en km"><span class="u">km</span></span>
+        </div>
+      </section>
+
+      <section class="grupo">
+        <h2>Lanzamiento</h2>
+        <div class="control">
+          <label for="rangoH">Altura <i>h</i></label>
+          <input type="range" id="rangoH" min="0" max="1000" step="1">
+          <span class="campo"><input id="campoH" inputmode="decimal" aria-label="Altura de partida"><span class="u" id="uH">km</span></span>
+        </div>
+        <div class="control">
+          <label for="rangoV">Rapidez <i>v</i></label>
+          <input type="range" id="rangoV" min="0" max="1000" step="1">
+          <span class="campo"><input id="campoV" inputmode="decimal" aria-label="Rapidez de lanzamiento"><span class="u" id="uV">km/s</span></span>
+        </div>
+        <div class="control">
+          <label for="rangoA">Ángulo <i>θ</i></label>
+          <input type="range" id="rangoA" min="-90" max="180" step="1">
+          <span class="campo"><input id="campoA" inputmode="decimal" aria-label="Ángulo sobre la horizontal en grados"><span class="u">°</span></span>
+        </div>
+        <div class="fila">
+          <button class="principal" id="lanzar">Lanzar</button>
+        </div>
+        <p class="nota">O arrastra la flecha cian. <i class="serif">θ</i> = 0° es horizontal; 90°, hacia arriba.</p>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Scripts clásicos (no módulos): así la página funciona abriendo index.html sin servidor. -->
+  <script src="js/fisica.js"></script>
+  <script src="js/mundos.js"></script>
+  <script src="js/formato.js"></script>
+  <script src="js/dibujo.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
