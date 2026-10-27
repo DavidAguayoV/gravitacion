@@ -54,7 +54,22 @@ https://davidaguayov.github.io/gravitacion/?reto=1
 https://davidaguayov.github.io/gravitacion/?reto=1&mundo=luna
 ```
 
-### Actividad «¿Escapa o vuelve?»
+## Misiones (para el celular)
+
+`mision.html?m=escapar`, `?m=orbitar` y `?m=llegar`: una página simple por misión, con un mundo,
+tres retos y una sola perilla (la rapidez). Cada reto dibuja su meta, dice qué pasó con cada
+lanzamiento («subió 1695 km: se pasó por 565 km») y anota los intentos.
+
+| Misión | Retos |
+|---|---|
+| Escapar de Ceres | escapar hacia arriba con lo justo; en horizontal; desde *h* = *R* |
+| El cañón de Newton en la Luna | caer a más de 2000 km; órbita circular; escapar en horizontal |
+| Llegar a la marca en Marte | 50 km (sirve *mgh*); 1130 km (no sirve); 3390 km (con *mgh* escapa) |
+
+Hoja para la clase (v2, 4 páginas: una para proyectar con los tres QR y una por misión):
+`2026_2_FIS093/Clases/actividad_simulacion_v2_hoja.tex` y su pauta `actividad_simulacion_v2_pauta.tex`.
+
+### Actividad «¿Escapa o vuelve?» (v1, modo reto)
 
 Hoja por grupo para usar solo con el celular o la tablet: `2026_2_FIS093/Clases/actividad_simulacion_hoja.tex`
 (cinco versiones: Luna, Marte, Mercurio, Titán y Ceres, cada una con su QR a `?reto=1&mundo=…`)
@@ -80,6 +95,7 @@ Sin compilación ni dependencias: HTML, CSS y JavaScript en scripts clásicos.
 - `js/formato.js` — números en español (coma decimal, potencias de diez).
 - `js/dibujo.js` — todo lo que se pinta en el lienzo.
 - `js/app.js` — controles, arrastre, bucle de animación y modo reto.
+- `js/mision.js` y `css/mision.css` — las misiones: retos, jueces y la página para el celular.
 
 Pruebas:
 
