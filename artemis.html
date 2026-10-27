@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Gravitación · Misión final: Artemis II</title>
+  <meta name="description" content="Misión final: llevar una nave por detrás de la Luna y de vuelta a la Tierra sin encender los motores. FIS093, UAI.">
+  <meta name="theme-color" content="#070a12">
+  <link rel="stylesheet" href="css/estilo.css?v=4">
+  <link rel="stylesheet" href="css/mision.css?v=4">
+</head>
+<body>
+  <!-- La parte libre que se abre al terminar una misión. La Tierra y la Luna se mueven; la nave siente a las dos. -->
+  <main class="mision artemis">
+    <header class="m-cabeza">
+      <div class="m-titulo">
+        <a href="./" class="m-sitio" id="volver">Gravitación</a>
+        <h1>Misión final: Artemis II</h1>
+      </div>
+      <p class="m-reto"><b>Lleven la nave por detrás de la Luna y de vuelta a la Tierra</b>, con un solo impulso al partir: después, los motores quedan apagados. Elijan la rapidez y dónde está la Luna al salir. <span class="a-cuenta" id="cuentaIntentos"></span></p>
+    </header>
+
+    <section class="m-escena" aria-label="Simulación">
+      <canvas id="lienzo" aria-label="La Tierra, la Luna y la nave. Arrastren la Luna para cambiar dónde está al partir."></canvas>
+      <button class="a-vista" id="vista" aria-pressed="false" title="La Tierra y la Luna quedan quietas: así se ve la forma del viaje">Girar con la Luna</button>
+      <p class="m-vivo" id="vivo"></p>
+    </section>
+
+    <section class="m-mando" aria-label="Lanzamiento">
+      <div class="m-aviso" id="aviso" aria-live="polite">
+        <p id="textoAviso"></p>
+        <button id="verSolucion" class="m-siguiente" hidden>Ver cómo se hace</button>
+      </div>
+      <p class="m-pista" id="solucion" hidden></p>
+      <p class="m-datos">La nave parte de una órbita a 185 km de altura. La Luna está a 384&nbsp;400&nbsp;km y avanza 13° por día. <button class="m-pista-boton" id="botonPista" aria-expanded="false">Pista</button></p>
+      <p class="m-pista" id="pista" hidden>Para llegar hasta la Luna hace falta casi la velocidad de escape (11,0 km/s a 185 km de altura), pero sin pasarse: si no, no vuelve. La nave llega al otro lado de la Tierra (180° desde la partida) en unos 3 a 4 días. ¿Dónde tiene que estar la Luna al partir para encontrarla ahí?</p>
+
+      <div class="m-rapidez">
+        <label for="campoV">Rapidez <i class="serif">v</i></label>
+        <button class="icono" id="menosV" aria-label="Menos rapidez">−</button>
+        <span class="campo"><input id="campoV" inputmode="decimal" aria-label="Rapidez de partida"><span class="u">km/s</span></span>
+        <button class="icono" id="masV" aria-label="Más rapidez">+</button>
+      </div>
+      <input type="range" id="rangoV" min="780" max="1150" step="1" aria-label="Rapidez de partida">
+
+      <div class="m-rapidez">
+        <label for="campoA">Luna</label>
+        <button class="icono" id="menosA" aria-label="Luna menos adelantada">−</button>
+        <span class="campo"><input id="campoA" inputmode="numeric" aria-label="Ángulo de la Luna al partir"><span class="u">°</span></span>
+        <button class="icono" id="masA" aria-label="Luna más adelantada">+</button>
+      </div>
+      <input type="range" id="rangoA" min="0" max="359" step="1" aria-label="Ángulo de la Luna al partir">
+
+      <button class="principal m-lanzar" id="lanzar">Lanzar</button>
+
+      <details class="m-intentos" open>
+        <summary>Desafíos libres</summary>
+        <ul class="a-logros" id="logros"></ul>
+      </details>
+      <details class="m-intentos" id="cajaIntentos" open>
+        <summary>Intentos <span id="cuenta"></span></summary>
+        <ol id="intentos" reversed></ol>
+      </details>
+      <p class="a-nota">Simplificado: todo pasa en un plano y la nave parte con un solo impulso. En el dibujo grande la Tierra y la Luna se ven más grandes que a escala; la lupa muestra la Luna a escala.</p>
+    </section>
+  </main>
+
+  <!-- Scripts clásicos (no módulos): así la página funciona abriendo el archivo sin servidor. -->
+  <!-- ?v=4: al cambiar el código, subir el número para que el navegador no use la copia vieja -->
+  <script src="js/fisica.js?v=4"></script>
+  <script src="js/formato.js?v=4"></script>
+  <script src="js/dibujo.js?v=4"></script>
+  <script src="js/tierraluna.js?v=4"></script>
+  <script src="js/artemis.js?v=4"></script>
+</body>
+</html>

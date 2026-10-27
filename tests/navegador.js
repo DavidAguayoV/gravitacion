@@ -187,6 +187,7 @@ async function abrir(b, query, movil) {
     await p.evaluate(() => localStorage.clear());
     const detalle = [];
     let bien = true;
+    const cerrada = await p.evaluate(() => document.getElementById('final').tagName === 'P');
     for (let n = 0; n < retos.length; n++) {
       await p.evaluate((n) => window.mision.elegirReto(n), n);
       for (const [v, ok] of retos[n]) {
@@ -200,8 +201,50 @@ async function abrir(b, query, movil) {
     const marcados = await p.evaluate(() => document.querySelectorAll('.m-boton-reto.logrado').length);
     const ancho = await p.evaluate(() => document.documentElement.scrollWidth);
     revisar(`misión ${m}: cada reto falla y se logra cuando debe`, bien && marcados === 3, detalle.join(' | '));
+    const abierta = await p.evaluate(() => document.getElementById('final').getAttribute('href') || '');
+    revisar(`misión ${m}: la misión final se abre al lograr los tres retos`, cerrada && abierta.startsWith('artemis.html?desde=' + m), abierta);
     revisar(`misión ${m}: sin desplazamiento horizontal ni errores`, ancho <= 390 && p.errores.length === 0, `scrollWidth ${ancho} ${p.errores.join(' | ')}`);
     await p.screenshot({ path: path.join(CAPTURAS, `mision-${m}.png`) });
+    await p.close();
+  }
+
+  // 7b. Misión final: tres intentos fallidos, «Ver cómo se hace», la solución y los desafíos libres
+  {
+    const p = await abrir(b, '', true);
+    await p.goto(PAGINA.replace('index.html', 'artemis.html') + '?desde=orbitar');
+    await p.evaluate(() => localStorage.clear());
+    await p.reload();
+    const lanzar = async (v, a) => {
+      await p.evaluate(([v, a]) => { artemis.ponerV(v); artemis.ponerA(a); }, [v, a]);
+      await p.tap('#lanzar');
+      await esperar(p, () => artemis.estado.sonda.juzgada, 40000);
+      return p.evaluate(() => ({ ok: document.getElementById('aviso').classList.contains('ok'), t: document.getElementById('textoAviso').textContent }));
+    };
+    const r1 = await lanzar(10500, 90);   // no llega
+    const r2 = await lanzar(10930, 120);  // choca con la Luna
+    const r3 = await lanzar(11100, 128);  // la Luna la lanza lejos
+    const boton = await p.evaluate(() => !document.getElementById('verSolucion').hidden);
+    revisar('Artemis: tres fallas y aparece «Ver cómo se hace»', !r1.ok && !r2.ok && !r3.ok && boton,
+      [r1.t, r2.t, r3.t].join(' | '));
+    await p.tap('#verSolucion');
+    await esperar(p, () => artemis.estado.sonda.juzgada, 40000);
+    const sol = await p.evaluate(() => ({
+      ok: document.getElementById('aviso').classList.contains('ok'),
+      explica: !document.getElementById('solucion').hidden,
+      logros: [...document.querySelectorAll('#logros li.ok')].length,
+    }));
+    revisar('Artemis: la solución rodea la Luna y vuelve, y se explica', sol.ok && sol.explica, JSON.stringify(sol));
+    const r4 = await lanzar(10960, 136); // honda gravitacional
+    const r5 = await lanzar(10950, 128);
+    const logros = await p.evaluate(() => [...document.querySelectorAll('#logros li.ok')].length);
+    revisar('Artemis: con 10,95 km/s y la Luna a 128° se logra; tres desafíos marcados', r5.ok && logros === 3, r4.t + ' | ' + r5.t);
+    await p.tap('#vista');
+    await p.waitForTimeout(300);
+    const ancho = await p.evaluate(() => document.documentElement.scrollWidth);
+    const volver = await p.evaluate(() => document.getElementById('volver').getAttribute('href'));
+    revisar('Artemis: vuelve a su misión, sin desplazamiento horizontal ni errores',
+      volver === 'mision.html?m=orbitar' && ancho <= 390 && p.errores.length === 0, `${volver} ${ancho} ${p.errores.join(' | ')}`);
+    await p.screenshot({ path: path.join(CAPTURAS, 'artemis.png') });
     await p.close();
   }
 

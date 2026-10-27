@@ -115,5 +115,28 @@ for (const angulo of [90, 0]) {
   revisar('U < 0 y K > 0', energias(s, tierra.M).U < 0 && energias(s, tierra.M).K > 0);
 }
 
+// 9. Tierra–Luna (misión final): con la Tierra y la Luna girando, lo que se conserva es la
+//    «energía de Jacobi», E − ωL (por kilo). La solución mostrada rodea la Luna por detrás y vuelve.
+{
+  require('../js/tierraluna.js');
+  const TL = globalThis.Grav.TierraLuna;
+  const jacobi = (s) => {
+    const b = TL.cuerpos(s.t, s.th0);
+    const r1 = Math.hypot(s.x - b.xt, s.y - b.yt), r2 = Math.hypot(s.x - b.xl, s.y - b.yl);
+    return 0.5 * (s.vx ** 2 + s.vy ** 2) - TL.GMT / r1 - TL.GML / r2 - TL.W * (s.x * s.vy - s.y * s.vx);
+  };
+  const s = TL.crear(10950, 128);
+  const J0 = jacobi(s);
+  let dJ = 0;
+  while (s.estado === 'vuelo') {
+    TL.avanzar(s, 3600);
+    if (s.estado === 'vuelo') dJ = Math.max(dJ, Math.abs((jacobi(s) - J0) / J0));
+  }
+  revisar('Tierra–Luna: la energía de Jacobi se conserva (< 0,01 %)', dJ < 1e-4, pct(dJ));
+  revisar('Tierra–Luna: 10,95 km/s con la Luna a 128° rodea la Luna por detrás y vuelve',
+    s.estado === 'tierra' && s.detras && s.dLmin < 6e7,
+    `${((s.dLmin - TL.RL) / 1e3).toFixed(0)} km sobre la Luna, ${(s.t / 86400).toFixed(1)} días`);
+}
+
 console.log(fallas ? `\n${fallas} prueba(s) fallaron.` : '\nTodas las pruebas pasan.');
 process.exit(fallas ? 1 : 0);

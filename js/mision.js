@@ -197,6 +197,28 @@
       b.addEventListener('click', () => elegirReto(i));
       nav.appendChild(b);
     });
+    mostrarFinal();
+  }
+
+  // ---------- La misión final, que se abre al lograr los tres retos ----------
+
+  const todosLogrados = () => estado.logrados.length === mision.retos.length;
+  const urlFinal = () => 'artemis.html?desde=' + clave + (q.get('tema') ? '&tema=' + q.get('tema') : '');
+
+  function mostrarFinal() {
+    const actual = $('final');
+    let nuevo;
+    if (todosLogrados()) {
+      nuevo = document.createElement('a');
+      nuevo.href = urlFinal();
+      nuevo.textContent = 'Se abrió la misión final: Artemis II →';
+    } else {
+      nuevo = document.createElement('p');
+      nuevo.textContent = `🔒 Misión final: se abre al lograr los tres retos (${estado.logrados.length} de ${mision.retos.length}).`;
+    }
+    nuevo.id = 'final';
+    nuevo.className = 'm-final';
+    actual.replaceWith(nuevo);
   }
 
   function elegirReto(i) {
@@ -374,11 +396,12 @@
     const aviso = $('aviso');
     aviso.dataset.listo = 'si';
     aviso.className = 'm-aviso ' + (ok ? 'ok' : 'no');
-    const todos = estado.logrados.length === mision.retos.length;
+    const todos = todosLogrados();
     $('textoAviso').textContent = ok && todos ? texto + ' Misión cumplida: anoten todo en la hoja.' : texto;
     const sig = mision.retos.findIndex((r, i) => !estado.logrados.includes(i) && i !== estado.n);
-    $('siguiente').hidden = !(ok && sig >= 0);
-    $('siguiente').onclick = () => elegirReto(sig);
+    $('siguiente').hidden = !(ok && (sig >= 0 || todos));
+    $('siguiente').textContent = sig >= 0 ? 'Siguiente reto →' : 'Misión final →';
+    $('siguiente').onclick = () => (sig >= 0 ? elegirReto(sig) : location.assign(urlFinal()));
   }
 
   /** Sin veredicto todavía: la franja dice qué hacer (o que la sonda va en camino). */

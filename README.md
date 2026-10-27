@@ -66,6 +66,17 @@ lanzamiento («subió 1695 km: se pasó por 565 km») y anota los intentos.
 | El cañón de Newton en la Luna | caer a más de 2000 km; órbita circular; escapar en horizontal |
 | Llegar a la marca en Marte | 50 km (sirve *mgh*); 1130 km (no sirve); 3390 km (con *mgh* escapa) |
 
+### Misión final: Artemis II (`artemis.html`)
+
+Se abre en cada misión al lograr sus tres retos (desde la página principal está siempre abierta).
+La Tierra y la Luna giran alrededor de su baricentro y la nave siente a las dos (`js/tierraluna.js`,
+RK4; se conserva la energía de Jacobi). Dos perillas: la rapidez de partida desde una órbita a
+185 km y el ángulo de la Luna al partir (también se arrastra la Luna). La meta es una trayectoria
+de retorno libre: rodear la Luna por detrás y volver a entrar al aire. Cada intento dice qué pasó
+(no llega, la Luna ya había pasado o no llegaba, chocó, pasa de largo, escapó). Tras tres intentos
+fallidos aparece «Ver cómo se hace» (10,95 km/s con la Luna a 128°). Hay una lupa con la Luna a
+escala y una vista que gira con la Luna. Desafíos libres: impacto lunar y honda gravitacional.
+
 Hoja para la clase (v2, 4 páginas: una para proyectar con los tres QR y una por misión):
 `2026_2_FIS093/Clases/actividad_simulacion_v2_hoja.tex` y su pauta `actividad_simulacion_v2_pauta.tex`.
 
@@ -96,6 +107,7 @@ Sin compilación ni dependencias: HTML, CSS y JavaScript en scripts clásicos.
 - `js/dibujo.js` — todo lo que se pinta en el lienzo.
 - `js/app.js` — controles, arrastre, bucle de animación y modo reto.
 - `js/mision.js` y `css/mision.css` — las misiones: retos, jueces y la página para el celular.
+- `js/tierraluna.js` y `js/artemis.js` — la misión final: motor Tierra–Luna y su página.
 
 Pruebas:
 
