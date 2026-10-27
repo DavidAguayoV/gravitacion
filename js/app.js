@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  const { MUNDOS, fmt, crearSonda, avanzar, vEscape, energias, escalaEnergia, tipoEnergia } = Grav;
+  const { MUNDOS, SITUACIONES, fmt, crearSonda, avanzar, vEscape, energias, escalaEnergia, tipoEnergia } = Grav;
   const $ = (id) => document.getElementById(id);
 
   // Colores y patrones de línea de las sondas: se distinguen aunque no se vean los colores.
@@ -23,6 +23,7 @@
     varias: false,       // true = cada lanzamiento agrega una sonda
     creadas: 0,
     ver: { fuerza: true, velocidad: true, circulo: false, regla: true },
+    reto: false,
   };
 
   const dibujo = new Grav.Dibujo($('lienzo'));
@@ -63,6 +64,8 @@
     $('campoA').value = fmt.decimal(lanz.angulo, 3);
     $('campoMs').value = fmt.numero(lanz.m, 3);
     $('nombreMundo').textContent = mundo.nombre;
+    document.querySelectorAll('#mundos button').forEach((b) =>
+      b.setAttribute('aria-pressed', String(MUNDOS[b.dataset.clave].nombre === mundo.nombre)));
     document.querySelectorAll('.campo.malo').forEach((c) => c.classList.remove('malo'));
   }
 
@@ -120,6 +123,7 @@
   function lanzar() {
     const { mundo, lanz } = estado;
     if (!estado.varias) estado.sondas = [];
+    marcarSituacion(null);
     if (estado.sondas.length >= COLORES.length) estado.sondas.shift(); // máximo 5 a la vez
     const s = crearSonda(mundo, lanz.h, lanz.v, lanz.angulo, lanz.m);
     const k = estado.creadas++ % COLORES.length;
@@ -297,6 +301,122 @@
     else if (e.key === 'r' || e.key === 'R') reiniciar();
   });
 
+  // ---------- Presets: mundos y situaciones ----------
+
+  /** Rapidez del tiempo para que una vuelta de período T (s) dure unos 6 s en pantalla. */
+  function elegirRapidez(T) {
+    const k = Math.min(5, Math.max(0, Math.round(Math.log10(T / 6))));
+    ponerRapidez(10 ** k);
+  }
+
+  function ponerRapidez(mult) {
+    estado.mult = mult;
+    $('rapidezTiempo').value = String(mult);
+  }
+
+  /** Período de una órbita circular de radio r: T = 2π √(r³/GM). */
+  const periodo = (r) => 2 * Math.PI * Math.sqrt(r ** 3 / (Grav.G * estado.mundo.M));
+
+  /** Pone un mundo con datos reales y deja lista una sonda para lanzar hacia arriba. */
+  function elegirMundo(clave, conLanzamiento = true) {
+    estado.mundo = { ...MUNDOS[clave] };
+    estado.sondas = [];
+    if (conLanzamiento) {
+      const v = vEscape(estado.mundo.M, estado.mundo.R);
+      estado.lanz.h = 0;
+      estado.lanz.angulo = 90;
+      estado.lanz.v = Number((0.8 * v).toPrecision(2)); // sube y vuelve a caer
+    }
+    elegirRapidez(periodo(estado.mundo.R));
+    encuadrar();
+    estado.autoVista = true;
+    marcarSituacion(null);
+    mostrarControles();
+  }
+
+  function marcarSituacion(clave) {
+    document.querySelectorAll('#situaciones button').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.clave === clave)));
+  }
+
+  /** Arma una situación: cambia de mundo si la situación lo pide y lanza sus sondas. */
+  function usarSituacion(clave) {
+    const sit = SITUACIONES[clave];
+    if (sit.mundo) elegirMundo(sit.mundo, false);
+    const { mundo } = estado;
+    const lista = sit.sondas(mundo);
+    const variasAntes = estado.varias;
+    estado.sondas = [];
+    estado.creadas = 0;
+    estado.varias = true; // una situación puede traer varias sondas a la vez
+    for (const L of lista) {
+      Object.assign(estado.lanz, L);
+      lanzar();
+    }
+    estado.varias = variasAntes || lista.length > 1;
+    $('optVarias').checked = estado.varias;
+    const r0 = mundo.R + estado.lanz.h;
+    dibujo.encuadrar(sit.vista * r0);
+    if (sit.mult) ponerRapidez(sit.mult);
+    else elegirRapidez(periodo(r0));
+    marcarSituacion(clave);
+    mostrarControles();
+  }
+
+  for (const [clave, m] of Object.entries(MUNDOS)) {
+    const b = document.createElement('button');
+    b.textContent = m.nombre;
+    b.dataset.clave = clave;
+    b.addEventListener('click', () => elegirMundo(clave));
+    $('mundos').appendChild(b);
+  }
+  for (const [clave, sit] of Object.entries(SITUACIONES)) {
+    const b = document.createElement('button');
+    b.textContent = sit.nombre;
+    b.dataset.clave = clave;
+    b.addEventListener('click', () => usarSituacion(clave));
+    $('situaciones').appendChild(b);
+  }
+
+  // ---------- Opciones: varias sondas, modo reto y proyector ----------
+
+  function ponerReto(si) {
+    estado.reto = si;
+    $('optReto').checked = si;
+    document.documentElement.classList.toggle('reto', si);
+  }
+
+  function ponerProyector(si) {
+    $('optProyector').checked = si;
+    document.documentElement.classList.toggle('proyector', si);
+    dibujo.leerColores();
+    alCambiarTamano();
+  }
+
+  $('optVarias').addEventListener('change', (e) => (estado.varias = e.target.checked));
+  $('optReto').addEventListener('change', (e) => ponerReto(e.target.checked));
+  $('optProyector').addEventListener('change', (e) => ponerProyector(e.target.checked));
+
+  /**
+   * Logros del reto: la primera vez que una sonda completa una vuelta casi circular o escapa,
+   * se anota con qué rapidez se lanzó. Así cada grupo puede informar lo que encontró.
+   */
+  function anotarLogros() {
+    for (const s of estado.sondas) {
+      if (s.anotada) continue;
+      let que = null;
+      if (s.circular === true) que = 'Órbita circular';
+      else if (s.estado === 'escapo' || s.estado === 'lejos') que = 'Escapó';
+      if (!que) continue;
+      s.anotada = true;
+      const L = s.lanzamiento;
+      const li = document.createElement('li');
+      li.innerHTML = `${que}: ${estado.mundo.nombre}, <i class="serif">h</i> = ${fmt.distancia(L.h, true)}, ` +
+        `<i class="serif">v</i> = ${fmt.rapidez(L.v, true)}, ${fmt.decimal(L.angulo, 3)}°`;
+      $('logros').appendChild(li);
+    }
+  }
+
   // ---------- Casillas de «Ver» ----------
 
   const CASILLAS = { verFuerza: 'fuerza', verVel: 'velocidad', verCirculo: 'circulo', verRegla: 'regla' };
@@ -408,6 +528,7 @@
     seguirSonda();
     dibujar();
     mostrarEstado();
+    anotarLogros();
     // El panel se actualiza unas 10 veces por segundo: los números no alcanzan a leerse más rápido.
     if (ahora - ultimoPanel > 100) { mostrarDatos(); ultimoPanel = ahora; }
     requestAnimationFrame(cuadro);
@@ -423,11 +544,20 @@
   }
   window.addEventListener('resize', alCambiarTamano);
 
-  $('rapidezTiempo').value = String(estado.mult);
+  // Opciones desde la dirección: ?reto=1&proyector=1&mundo=luna&situacion=canon
+  const q = new URLSearchParams(location.search);
+  const si = (k) => ['1', 'si', 'sí', 'true'].includes((q.get(k) || '').toLowerCase());
   alCambiarTamano();
+  ponerReto(si('reto'));
+  if (si('proyector')) ponerProyector(true);
+  if (q.get('varias')) { estado.varias = si('varias'); $('optVarias').checked = estado.varias; }
+  const mundoQ = (q.get('mundo') || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); // «Júpiter» → «jupiter»
+  if (MUNDOS[mundoQ]) elegirMundo(mundoQ);
+  else ponerRapidez(estado.mult);
+  if (SITUACIONES[q.get('situacion')]) usarSituacion(q.get('situacion'));
   mostrarControles();
   requestAnimationFrame(cuadro);
 
   // Acceso para depurar desde la consola del navegador
-  window.gravitacion = { estado, dibujo, lanzar, reiniciar, encuadrar };
+  window.gravitacion = { estado, dibujo, lanzar, reiniciar, encuadrar, usarSituacion, elegirMundo, ponerReto };
 })();

@@ -49,8 +49,20 @@
     </section>
 
     <aside class="panel">
+      <section class="grupo solo-reto" id="grupoReto">
+        <h2>Reto</h2>
+        <p class="reto-texto">Encuentren la rapidez para una <b>órbita circular</b> y la rapidez para <b>escapar</b>. Prueben valores en <i class="serif">v</i>.</p>
+        <ol class="logros" id="logros"></ol>
+      </section>
+
+      <section class="grupo pista">
+        <h2>Situaciones</h2>
+        <div class="botones" id="situaciones"></div>
+      </section>
+
       <section class="grupo">
         <h2>Mundo</h2>
+        <div class="chips" id="mundos" role="group" aria-label="Mundos con datos reales"></div>
         <div class="control">
           <label for="rangoM">Masa <i>M</i></label>
           <input type="range" id="rangoM" min="0" max="1000" step="1">
@@ -114,6 +126,16 @@
           <label><input type="checkbox" id="verCirculo"> Círculo a la altura actual</label>
           <label><input type="checkbox" id="verRegla" checked> Regla</label>
         </div>
+      </section>
+
+      <section class="grupo">
+        <h2>Opciones</h2>
+        <div class="marcas">
+          <label><input type="checkbox" id="optVarias"> Varias sondas</label>
+          <label><input type="checkbox" id="optReto"> Modo reto</label>
+          <label><input type="checkbox" id="optProyector"> Proyector</label>
+        </div>
+        <p class="nota">En la dirección: <code>?reto=1</code>, <code>?proyector=1</code>, <code>?mundo=luna</code>, <code>?situacion=canon</code>.</p>
       </section>
     </aside>
   </main>

@@ -304,6 +304,23 @@ input[type='range'] {
 .tipoE.limite { color: var(--ink); }
 .tipoE.libre { color: var(--ok); }
 
+/* Botones de situaciones y de mundos */
+.botones { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.botones button { text-align: left; font-size: var(--t-sm); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chips button { min-height: 34px; padding: 0 10px; border-radius: 999px; font-size: var(--t-sm); }
+.botones button[aria-pressed='true'], .chips button[aria-pressed='true'] { background: #10202a; }
+
+/* Modo reto: se ocultan v_c, v_e, energías y las situaciones que regalan la respuesta */
+.reto .pista { display: none !important; }
+.solo-reto { display: none; }
+.reto .solo-reto { display: block; }
+.reto-texto { margin: 0; line-height: 1.45; }
+.logros { margin: 8px 0 0; padding-left: 1.3em; color: var(--ok); }
+.logros li { margin: 3px 0; }
+.logros:empty { display: none; }
+code { font-family: var(--mono); font-size: 0.95em; color: var(--ink); }
+
 /* Casillas */
 .marcas { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
 .marcas label { display: flex; align-items: center; gap: 8px; min-height: 36px; cursor: pointer; }

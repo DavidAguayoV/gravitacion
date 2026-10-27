@@ -131,7 +131,17 @@
         const [, yTop] = this.aPx(0, m.R + h);
         const [, ySup] = this.aPx(0, m.R);
         const alto = ySup - yTop;
-        if (alto > 2) {
+        if (h > 0.12 * m.R) {
+          // Muy alto para una montaña: solo una línea tenue que marca la altura de partida.
+          ctx.strokeStyle = this.c.linea;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([2, 4]);
+          ctx.beginPath();
+          ctx.moveTo(cx, ySup);
+          ctx.lineTo(cx, yTop);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        } else if (alto > 2) {
           const base = Math.max(alto * 0.9, 8);
           ctx.fillStyle = aclarar(m.color, -0.3);
           ctx.beginPath();
