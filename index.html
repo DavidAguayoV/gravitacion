@@ -6,7 +6,7 @@
   <title>Gravitación</title>
   <meta name="description" content="Lanza sondas alrededor de un mundo: fuerza, velocidad, órbitas, escape y energía. FIS093, UAI.">
   <meta name="theme-color" content="#070a12">
-  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/estilo.css?v=2">
 </head>
 <body>
   <main class="app">
@@ -144,10 +144,11 @@
   </main>
 
   <!-- Scripts clásicos (no módulos): así la página funciona abriendo index.html sin servidor. -->
-  <script src="js/fisica.js"></script>
-  <script src="js/mundos.js"></script>
-  <script src="js/formato.js"></script>
-  <script src="js/dibujo.js"></script>
-  <script src="js/app.js"></script>
+  <!-- ?v=2: al cambiar el código, subir el número para que el navegador no use la copia vieja -->
+  <script src="js/fisica.js?v=2"></script>
+  <script src="js/mundos.js?v=2"></script>
+  <script src="js/formato.js?v=2"></script>
+  <script src="js/dibujo.js?v=2"></script>
+  <script src="js/app.js?v=2"></script>
 </body>
 </html>
