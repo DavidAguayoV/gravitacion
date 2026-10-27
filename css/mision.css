@@ -1,0 +1,143 @@
+/* mision.css — Las misiones: pensadas primero para el celular en vertical.
+   Usa las variables, letras y botones de estilo.css. */
+
+.mision {
+  display: grid;
+  grid-template-rows: auto minmax(300px, 1fr) auto;
+  min-height: 100dvh;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ---------- Cabeza: título, retos y lo que hay que hacer ---------- */
+
+.m-cabeza { padding: 10px 16px 8px; }
+.m-titulo { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.m-sitio {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.m-titulo h1 { margin: 0; font-size: var(--t-lg); font-weight: 600; }
+
+.m-retos { display: flex; gap: 6px; margin: 10px 0 8px; }
+.m-boton-reto {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 8px;
+  font-size: var(--t-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.m-num {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: var(--t-xs);
+  margin-right: 2px;
+}
+.m-boton-reto.logrado { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 55%, transparent); }
+.m-boton-reto.logrado[aria-pressed='true'] { border-color: var(--ok); }
+
+.m-reto { margin: 0; font-size: var(--t-md); line-height: 1.4; }
+
+/* ---------- Escena ---------- */
+
+.m-escena {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, var(--bg-center) 0%, var(--bg) 55%, var(--bg-edge) 100%);
+}
+.m-escena #lienzo { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+
+.m-vivo {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  color: var(--muted);
+  pointer-events: none;
+}
+.m-vivo .serif { color: var(--muted); }
+
+/* Lo que pasó con el último lanzamiento: una franja fija arriba del mando */
+.m-aviso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 52px;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.m-aviso p { margin: 0; flex: 1 1 180px; font-size: var(--t-md); line-height: 1.35; }
+.m-aviso[data-listo='si'] { color: var(--ink); border-color: var(--control); animation: aparece 0.25s ease-out; }
+.m-aviso.ok { border-color: var(--ok); color: var(--ok); }
+.m-aviso.ok p { font-weight: 600; }
+.m-siguiente { border-color: var(--ok); color: var(--ok); }
+@keyframes aparece { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Mando ---------- */
+
+.m-mando { padding: 10px 16px 24px; border-top: 1px solid var(--line); background: var(--panel); }
+.m-datos { margin: 0 0 8px; font-size: var(--t-xs); color: var(--muted); line-height: 1.5; }
+.m-datos .serif { color: var(--ink); }
+.m-pista-boton { min-height: 28px; padding: 0 10px; margin-left: 4px; font-size: var(--t-xs); color: var(--vel); border-color: var(--line); }
+.m-pista { margin: 0 0 10px; padding: 8px 12px; border-left: 2px solid var(--vel); font-size: var(--t-sm); line-height: 1.45; }
+
+.m-rapidez {
+  display: grid;
+  grid-template-columns: auto 48px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+}
+.m-rapidez label { color: var(--muted); font-size: var(--t-sm); }
+.m-rapidez .serif { color: var(--ink); }
+.m-rapidez button.icono { width: 48px; min-height: 48px; font-size: 22px; }
+.m-rapidez .campo { height: 48px; }
+/* 17 px: con menos, el iPhone agranda la página al tocar el campo */
+.m-rapidez .campo input { font-size: 17px; }
+.m-rapidez .campo .u { font-size: var(--t-sm); }
+
+.m-mando input[type='range'] { width: 100%; margin: 12px 0; }
+
+.m-lanzar { width: 100%; min-height: 52px; font-size: var(--t-lg); }
+
+.m-intentos { margin-top: 12px; font-size: var(--t-sm); }
+.m-intentos summary { cursor: pointer; color: var(--muted); padding: 4px 0; }
+.m-intentos ol { margin: 6px 0 0; padding-left: 1.6em; line-height: 1.45; }
+.m-intentos li { margin: 3px 0; color: var(--muted); }
+.m-intentos li b { color: var(--ink); font-family: var(--mono); font-weight: 500; }
+.m-intentos li.ok { color: var(--ok); }
+
+/* ---------- Pantallas anchas (tablet acostada, notebook): dibujo a la izquierda ---------- */
+
+@media (min-width: 820px) and (min-aspect-ratio: 1/1) {
+  .mision {
+    grid-template-columns: 1fr 380px;
+    grid-template-rows: auto 1fr;
+    height: 100dvh;
+    min-height: 0;
+  }
+  .m-cabeza { grid-column: 2; grid-row: 1; padding-top: 16px; }
+  .m-escena { grid-column: 1; grid-row: 1 / span 2; }
+  .m-mando { grid-column: 2; grid-row: 2; border-top: 0; overflow-y: auto; }
+  .m-cabeza, .m-mando { background: var(--panel); border-left: 1px solid var(--line); }
+}
+
+/* Celular: el dibujo deja ver el botón Lanzar sin bajar */
+@media (max-width: 819px) {
+  .mision { grid-template-rows: auto min(52dvh, 560px) auto; }
+}

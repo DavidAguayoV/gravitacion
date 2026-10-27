@@ -174,28 +174,34 @@ async function abrir(b, query, movil) {
     await p.close();
   }
 
-  // 7. La actividad «¿Escapa o vuelve?» en el celular, con los valores de la hoja (3 cifras)
-  for (const [mundo, ve] of [['luna', 2.37], ['marte', 5.03], ['mercurio', 4.25], ['titan', 2.64], ['ceres', 0.516]]) {
-    const p = await abrir(b, `?reto=1&mundo=${mundo}`, true);
-    const lanzarCon = async (v, angulo, h = 0) => {
-      await p.fill('#campoH', String(h)); await p.press('#campoH', 'Enter');
-      await p.fill('#campoA', String(angulo));
-      await p.fill('#campoV', String(Number(v.toPrecision(3))).replace('.', ',')); // sin Enter: el toque cierra el campo
-      await p.tap('#lanzar');
-      await p.evaluate(() => (window.gravitacion.estado.mult = 1e5));
-      await esperar(p, () => { const s = window.gravitacion.estado.sondas[0]; return s.estado !== 'vuelo' || s.vueltas >= 1; }, 60000);
-      return p.evaluate(() => { const g = window.gravitacion.estado, s = g.sondas[0]; return { estado: s.estado, circular: s.circular, h: (s.rMax - g.mundo.R) / g.mundo.R }; });
-    };
-    const kmS = mundo === 'ceres' ? 1000 : 1; // en Ceres el campo pide m/s
-    const a = await lanzarCon(0.9 * ve * kmS, 90);
-    const c = await lanzarCon(1.1 * ve * kmS, 0);
-    const d = await lanzarCon(ve / 2 * kmS, 90);
-    const R = await p.evaluate(() => window.gravitacion.estado.mundo.R / 1000);
-    const e = await lanzarCon(ve / 2 * kmS, 0, R);
-    const lista = await p.evaluate(() => document.querySelectorAll('#logros li').length);
-    revisar(`actividad ${mundo}: 0,9 v_e vuelve, 1,1 v_e horizontal escapa, v_e/2 sube R/3, órbita a h = R`,
-      a.estado === 'impacto' && c.estado !== 'impacto' && Math.abs(d.h - 1 / 3) < 0.01 && e.circular === true && lista === 4,
-      `h(0,9) = ${a.h.toFixed(2)} R, h(v_e/2) = ${d.h.toFixed(3)} R, circular: ${e.circular}, registro: ${lista}`);
+  // 7. Las misiones en el celular: cada reto, con una rapidez que falla y otra que lo logra
+  //    (las de la hoja, con 3 cifras). En Marte, la rapidez de mgh para h = R escapa.
+  const MISIONES = {
+    escapar: [[[400, false], [520, true]], [[400, false], [520, true]], [[300, false], [370, true]]],
+    orbitar: [[[1300, false], [1550, true]], [[1700, false], [1610, true]], [[2000, false], [2290, true]]],
+    llegar: [[[700, false], [611, true]], [[2900, false], [2510, true]], [[5030, false], [3550, true]]],
+  };
+  for (const [m, retos] of Object.entries(MISIONES)) {
+    const p = await abrir(b, '', true);
+    await p.goto(PAGINA.replace('index.html', 'mision.html') + '?m=' + m);
+    await p.evaluate(() => localStorage.clear());
+    const detalle = [];
+    let bien = true;
+    for (let n = 0; n < retos.length; n++) {
+      await p.evaluate((n) => window.mision.elegirReto(n), n);
+      for (const [v, ok] of retos[n]) {
+        await p.evaluate((v) => window.mision.ponerRapidez(v), v);
+        await p.tap('#lanzar');
+        const listo = await esperar(p, () => document.getElementById('aviso').dataset.listo === 'si', 30000);
+        const logro = await p.evaluate(() => document.getElementById('aviso').classList.contains('ok'));
+        if (!listo || logro !== ok) { bien = false; detalle.push(`reto ${n + 1}, ${v} m/s: ${await p.textContent('#textoAviso')}`); }
+      }
+    }
+    const marcados = await p.evaluate(() => document.querySelectorAll('.m-boton-reto.logrado').length);
+    const ancho = await p.evaluate(() => document.documentElement.scrollWidth);
+    revisar(`misión ${m}: cada reto falla y se logra cuando debe`, bien && marcados === 3, detalle.join(' | '));
+    revisar(`misión ${m}: sin desplazamiento horizontal ni errores`, ancho <= 390 && p.errores.length === 0, `scrollWidth ${ancho} ${p.errores.join(' | ')}`);
+    await p.screenshot({ path: path.join(CAPTURAS, `mision-${m}.png`) });
     await p.close();
   }
 

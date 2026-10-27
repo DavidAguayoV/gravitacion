@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Gravitación · Misión</title>
+  <meta name="description" content="Tres retos de gravitación para resolver en grupo desde el celular. FIS093, UAI.">
+  <meta name="theme-color" content="#070a12">
+  <link rel="stylesheet" href="css/estilo.css?v=3">
+  <link rel="stylesheet" href="css/mision.css?v=3">
+</head>
+<body>
+  <!-- Una misión = un mundo y tres retos. Cuál, lo dice la dirección: mision.html?m=escapar | orbitar | llegar -->
+  <main class="mision">
+    <header class="m-cabeza">
+      <div class="m-titulo">
+        <a href="./" class="m-sitio">Gravitación</a>
+        <h1 id="titulo">Misión</h1>
+      </div>
+      <nav class="m-retos" id="retos" aria-label="Retos"></nav>
+      <p class="m-reto" id="textoReto"></p>
+    </header>
+
+    <section class="m-escena" aria-label="Simulación">
+      <canvas id="lienzo" aria-label="Mundo y sonda. Arrastra la flecha para cambiar la rapidez."></canvas>
+      <p class="m-vivo" id="vivo"></p>
+    </section>
+
+    <section class="m-mando" aria-label="Lanzamiento">
+      <!-- Lo que pasó con el último lanzamiento: siempre en el mismo lugar, sin tapar el dibujo -->
+      <div class="m-aviso" id="aviso" aria-live="polite">
+        <p id="textoAviso"></p>
+        <button id="siguiente" class="m-siguiente" hidden>Siguiente reto →</button>
+      </div>
+      <p class="m-datos"><span id="datos"></span> <button class="m-pista-boton" id="botonPista" aria-expanded="false">Pista</button></p>
+      <p class="m-pista" id="pista" hidden></p>
+      <div class="m-rapidez">
+        <label for="campoV">Rapidez <i class="serif">v</i></label>
+        <button class="icono" id="menos" aria-label="Menos rapidez">−</button>
+        <span class="campo"><input id="campoV" inputmode="decimal" aria-label="Rapidez de lanzamiento"><span class="u" id="uV">km/s</span></span>
+        <button class="icono" id="mas" aria-label="Más rapidez">+</button>
+      </div>
+      <input type="range" id="rangoV" min="0" max="1000" step="1" aria-label="Rapidez de lanzamiento">
+      <button class="principal m-lanzar" id="lanzar">Lanzar <span id="direccion"></span></button>
+      <details class="m-intentos" id="cajaIntentos" open>
+        <summary>Intentos <span id="cuenta"></span></summary>
+        <ol id="intentos" reversed></ol>
+      </details>
+    </section>
+  </main>
+
+  <!-- Scripts clásicos (no módulos): así la página funciona abriendo el archivo sin servidor. -->
+  <!-- ?v=3: al cambiar el código, subir el número para que el navegador no use la copia vieja -->
+  <script src="js/fisica.js?v=3"></script>
+  <script src="js/mundos.js?v=3"></script>
+  <script src="js/formato.js?v=3"></script>
+  <script src="js/dibujo.js?v=3"></script>
+  <script src="js/mision.js?v=3"></script>
+</body>
+</html>

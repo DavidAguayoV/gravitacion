@@ -1,9 +1,9 @@
 /*
  * dibujo.js — Todo lo que se pinta en el lienzo (Canvas 2D).
  *
- * El mundo está en el centro del lienzo. La vista guarda cuántos píxeles mide un metro
- * (escala) y el dibujo usa siempre la MISMA escala en x y en y: si no, los vectores
- * apuntarían a ángulos falsos.
+ * El mundo está en el centro del lienzo (salvo que la vista se corra con «centro», como en
+ * las misiones). La vista guarda cuántos píxeles mide un metro (escala) y el dibujo usa
+ * siempre la MISMA escala en x y en y: si no, los vectores apuntarían a ángulos falsos.
  * En el mundo, y crece hacia arriba; en el lienzo, hacia abajo. aPx() hace el cambio.
  */
 (function (raiz) {
@@ -18,6 +18,7 @@
       this.w = 0;
       this.h = 0;
       this.escala = 1; // píxeles por metro
+      this.centro = [0, 0]; // punto del mundo (m) que queda en el medio del lienzo
       this.leerColores();
     }
 
@@ -57,11 +58,11 @@
     }
 
     aPx(x, y) {
-      return [this.w / 2 + x * this.escala, this.h / 2 - y * this.escala];
+      return [this.w / 2 + (x - this.centro[0]) * this.escala, this.h / 2 - (y - this.centro[1]) * this.escala];
     }
 
     aMundo(px, py) {
-      return [(px - this.w / 2) / this.escala, (this.h / 2 - py) / this.escala];
+      return [this.centro[0] + (px - this.w / 2) / this.escala, this.centro[1] + (this.h / 2 - py) / this.escala];
     }
 
     /** ¿El punto del mundo (x, y) cae dentro del lienzo, con un margen en píxeles? */
