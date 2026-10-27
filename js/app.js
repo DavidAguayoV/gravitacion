@@ -528,7 +528,7 @@
   function seguirSonda() {
     const s = estado.sondas[estado.elegida];
     if (!estado.autoVista || !s || s.estado === 'impacto' || s.estado === 'lejos') return;
-    if (!dibujo.dentro(s.x, s.y, 30) && dibujo.radioVisible() < 60 * estado.mundo.R) {
+    if (!dibujo.dentro(s.x, s.y, 0.12 * Math.min(dibujo.w, dibujo.h)) && dibujo.radioVisible() < 60 * estado.mundo.R) {
       dibujo.escala /= 1.04;
     }
   }
